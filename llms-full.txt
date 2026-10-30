@@ -1,0 +1,1111 @@
+# DeepSeek Harness 个人知识库 — 全量文本（llms-full.txt）
+
+本文件为知识库全量拼接版，供模型/Agent 单次抓取。
+文件清单与索引见 llms.txt；仓库地址 https://github.com/xiexie512/deepseek-harness-kb
+
+
+<!-- ====================== docs/overview.md ====================== -->
+
+# 项目概览
+
+> 来源：deepseek-ai/deepseek-harness 官方 README 与文档（MIT License），本文件为个人知识库的精选整理。
+
+## 是什么
+
+**DeepSeek Harness（`dsh`）** 是由 [DeepSeek AI](https://deepseek.com) 开发的开源 agent harness（智能体框架），构建于 **「一切皆插件」** 的架构之上，底层由 [Cordis](https://github.com/cordiverse/cordis) 驱动。
+
+- 设计论文：*A Programming Paradigm for Spatiotemporal Composability*（https://arxiv.org/abs/2608.25512）
+- 官方文档站：https://deepseek-harness.github.io/deepseek-harness/
+- 源码仓库：https://github.com/deepseek-ai/deepseek-harness
+- 许可证：**MIT**（可自由使用、修改、商用）
+
+## 核心设计理念
+
+模型的每一部分都是插件，包括：
+
+- 模型适配器（LLM adapters）
+- 工具注册表（tool registries）
+- 会话日志（session logs）
+- Agent loop（智能体循环）本身
+
+因此**每一个能力都可以从配置替换**。不存在需要打补丁的特权内核：扩展 dsh 的方式是把插件挂载到其他插件旁边，各项注册都是副作用（effect），会在插件卸载时自动撤销。
+
+## 状态提示
+
+当前处于**开发者预览（Developer Preview）**阶段，正在快速迭代，**未来将出现破坏兼容性的变更**。运行前请阅读官方 [SAFETY 说明](https://github.com/deepseek-ai/deepseek-harness/blob/main/SAFETY.zh.md)。
+
+## 生态与支持
+
+- 反馈 / bug 报告：GitHub Discussions
+- 插件发现：给插件仓库添加 [`dsh-plugin`](https://github.com/topics/dsh-plugin) topic
+- 引用：
+
+```bibtex
+@misc{deepseek-harness2026,
+  title={DeepSeek Harness: Everything is a Plugin},
+  author={DeepSeek-AI},
+  year={2026},
+  publisher={GitHub},
+  howpublished={\url{https://github.com/deepseek-ai/deepseek-harness}},
+}
+```
+
+## 相关文档索引
+
+| 本知识库文件 | 内容 |
+|---|---|
+| [quickstart.md](quickstart.md) | 安装与快速开始 |
+| [cli.md](cli.md) | `dsh` 命令行参考 |
+| [architecture.md](architecture.md) | 架构：Cordis、profile、事件、轮次流程 |
+| [plugins.md](plugins.md) | 插件机制与开发 |
+| [configuration.md](configuration.md) | 配置体系（DSH_HOME / profiles / patch） |
+| [models.md](models.md) | 模型提供商配置 |
+| [sdk.md](sdk.md) | Python SDK |
+| [glossary.md](glossary.md) | 术语表 |
+
+<!-- ====================== docs/quickstart.md ====================== -->
+
+# 快速开始
+
+> 来源：deepseek-ai/deepseek-harness 根 README 与 docs/user/guide（MIT License）。
+
+## 通过 npm 运行
+
+安装 Node.js 后：
+
+```sh
+npx @deepseek-ai/dsh web
+```
+
+- 默认在 `http://127.0.0.1:3080` 启动 Web UI，本机启动时会用默认浏览器打开页面。
+- 通过 SSH 启动时只打印宿主机 URL。
+- 传 `--no-open` 只运行服务器不打开浏览器。
+
+## 从源码运行
+
+```sh
+git clone https://github.com/deepseek-ai/deepseek-harness.git
+cd deepseek-harness
+pnpm install
+pnpm run build
+pnpm dsh web
+```
+
+`pnpm run build` 会准备仓库产物；`pnpm dsh web` 直接使用已构建产物，不会重新构建。
+
+## Web UI 使用流程
+
+1. **启动**：`dsh web`（或桌面应用），等服务器运行，命令会打印访问地址。
+2. **配置模型**：打开 **设置 → 模型**，输入 [DeepSeek API 密钥](https://platform.deepseek.com/) 并保存。模型路由立即生效，不需要重启服务器。其他提供商与自定义 OpenAI 兼容端点见 [models.md](models.md)。
+3. **选择工作区**：点击「选择工作区」，添加启动 `dsh` 时所在的项目目录并选中。选中前会话输入框不可用。
+4. **运行任务**：启动会话并发送指令。Agent 可以读写工作区文件、运行命令、委派工作、维护计划；需要审批的操作 Web UI 会先询问。
+
+> 注意：`dsh` 进程会把启动时所在的目录作为默认文件系统位置。
+
+## 安装插件
+
+```sh
+# 全局安装 dsh 启动器与 pnpm（已装可跳过）
+npm install -g @deepseek-ai/dsh pnpm
+
+# 向指定 profile 安装插件（web 模式用 --profile web）
+dsh plugin --profile web add <package-name>
+```
+
+装完需要重启 `dsh web` 或桌面应用才生效（运行中的进程持有内存里的旧插件）。
+
+## 常见版本信息
+
+- 当前版本查看：`dsh --version`
+- 桌面应用（Electron）与 npm CLI 共享产品数据，但包、启用选择与锁文件相互独立。
+- 知识库编写时本机环境：dsh `0.2.1-rc.3`（见 [notes/setup](../notes/setup.md)）。
+
+<!-- ====================== docs/cli.md ====================== -->
+
+# dsh 命令行参考
+
+> 来源：docs/cli-help.zh.md（官方自动生成，MIT License）。同份帮助只展示一次，列出所有调用方式。
+
+## 主命令
+
+```
+dsh [--profile] <name> [options] [app-args...]
+dsh plugin --profile <name> <pnpm-args...>
+```
+
+**选项**
+
+| 选项 | 说明 |
+|---|---|
+| `-V, --version` | 输出版本号 |
+| `--profile <name>` | 启动 `$DSH_HOME/profiles` 下的 profile |
+| `--from-default-profile <name>` | 用随附 profile 模板重建一个自定义 profile |
+| `--patch <path>` | 在 profile 层之后追加的 patch 覆盖（可重复） |
+| `--dump-config` | 打印组合后的配置树并退出 |
+| `--dump-config-schema` | 打印 profile 条目与 patch 的 JSON Schema（不挂载） |
+| `--dump-default-config` | 打印不含用户层与 `--patch` 覆盖的配置树 |
+
+**示例**
+
+```sh
+dsh web                                   # 启动 web profile（同 dsh --profile web）
+dsh rescue --from-default-profile web     # 用 web 模板重建 rescue profile 再启动
+dsh headless "run the tests"              # 回答一个任务、打印结果、退出
+dsh tui --patch ./extra.yml               # 自定义 profile + 一个额外 overlay
+dsh web --help                            # web app 自己的参数与帮助
+dsh plugin --profile tui add <package>    # 向 tui profile 安装插件
+```
+
+## 随附 profile
+
+| Profile | 作用 |
+|---|---|
+| `web` | 浏览器 UI（默认 `http://127.0.0.1:3080`） |
+| `headless` | 一次性任务运行器：回答一个任务后退出 |
+| `sdk` | 通过 stdio JSON-RPC 服务 SDK 客户端 |
+| `sdk-minimal` | SDK 客户端（刻意极简，不加载 `dsh-base`） |
+| `acp` | 通过 Agent Client Protocol stdio 服务自动化客户端 |
+| `plugin` | 管理命令（同名 profile 需用 `--profile plugin` 选择） |
+
+## 各 profile 详情
+
+### `dsh headless`
+
+```
+dsh --profile headless [options] [task...]
+```
+
+- `task`：任务文本，多词自动以空格连接；`-` 表示从 stdin 读取。
+- `--json`：向 stdout 输出换行分隔的运行事件（而非最终消息）。
+- `--session-id <id>`：沿用持久化的 Session；未知 id 报错。
+
+```sh
+dsh --profile headless "run the tests"                # 答完即退
+echo "run the tests" | dsh --profile headless         # 从 stdin 读任务
+dsh --profile headless --json "run the tests"         # 机器可读事件
+dsh --profile headless --session-id session-… "continue"   # 恢复已有会话
+```
+
+### `dsh web`
+
+```
+dsh --profile web [options]
+```
+
+- `--host <host>`：绑定地址（必须是本机某个具体 IPv4/IPv6 地址，拒绝通配符）
+- `--no-open`：不自动打开浏览器
+- `--port <port>`：监听端口；`0` 表示让系统分配
+- `--public-url <url>`：声明 HTTP(S) 根地址（不授予信任）
+- `--trusted-host <authority...>`：额外的 browser-trust 受信 host（可重复）
+- `--tls-cert <file>` / `--tls-key <file>`：启用 HTTPS（两个必须同时提供）
+
+```sh
+dsh --profile web                          # 组合配置的 host 与 port
+dsh --profile web --port 8080              # 换端口
+dsh --profile web --host 10.0.0.7          # 绑定指定网卡
+dsh --profile web --no-open                # 不开浏览器
+```
+
+### `dsh sdk` / `dsh sdk-minimal`
+
+```
+dsh --profile sdk [options]                # 服务 SDK 客户端直至断开
+dsh --profile sdk-minimal [options]        # 极简 SDK 运行时
+```
+
+### `dsh acp`
+
+```
+dsh --profile acp [options]                # 服务 ACP 客户端直至断开
+```
+
+### `dsh plugin`
+
+```
+dsh plugin [--profile <name>] <pnpm-args...>
+```
+
+把剩余参数原样转发给 profile 目录下的 pnpm：`add <pkg>`、`remove <pkg>`、`why <pkg>` 等。首次使用会初始化该 profile。
+
+## 查看配置树
+
+```sh
+dsh --profile web --dump-config
+```
+
+打印出的任何条目都可以被你自己的 patch 替换。
+
+<!-- ====================== docs/architecture.md ====================== -->
+
+# 架构
+
+> 来源：docs/architecture.zh.md（MIT License）。改动 `packages/` 下任何内容前，官方要求先读此文。本文是核心概念的精选整理。
+
+## 底层框架：Cordis
+
+[Cordis](https://github.com/cordiverse/cordis) 是 dsh 底层的插件框架：插件向共享上下文贡献**服务**、**类型化事件**和**可逆的副作用**。产品的每一部分都是插件——模型适配器、工具注册表、会话日志、agent loop 本身——因此每个都可以从配置替换。
+
+不存在需要打补丁的特权内核：扩展 dsh 的方式是把插件挂载到其他插件旁边，各项注册是副作用，会在插件卸载时撤销。
+
+## Profile 与组合包（Bundle）
+
+运行中的 `dsh` 是一棵插件树，由启动时**按序叠加的各层**组合而成。
+
+- **profile**：存放在 Harness home 中的具名组装。列出自己叠放的组合包、存放树外插件、保存用户自己的 `cordis.patch.yml`。随发行版交付模板：`web`、`headless`、`sdk`、`sdk-minimal`、`acp`。
+- **组合包（bundle）**：Cordis 配置项及其挂载代码的分发格式，插入的内容始终可被其上各层 patch。
+- 两者都在 `package.json` 的 `dsh` 字段声明：`dsh.profile` 列出组合包，`dsh.bundle` 指向 patch 文件。
+
+**分层基准（共享第一层）**：`dsh-base` 提供模型适配器、工具、持久化、沙箱与审批策略、设置、凭据、遥测。在此基础上：
+- `dsh-web-app` 增加浏览器应用；
+- `dsh-headless` 增加不带服务器的一次性运行器；
+- `dsh-sdk-app` 增加 SDK JSON-RPC 服务器；
+- `dsh-acp-app` 增加仅用于自动化的 ACP 服务器；
+- `dsh-sdk-minimal` 是刻意例外：拥有完整显式 SDK 配置树，**不应用 `dsh-base`**。
+
+**层优先级**：profile 中有序的组合包 → 其 `cordis.patch.yml` → home patch → 最后是 `--patch` overlay。patch 按 id 定位条目并替换其整个 config，或插入新条目；`preset` patch 在目标声明的 `config.plugins` 内应用。
+
+**查看配置树**：
+
+```sh
+dsh --profile web --dump-config
+```
+
+## 应用启动
+
+受支持的 Node 应用通过具名 profile 启动：`dsh --profile <name>` 或 `dsh <name>`。Python SDK 复用同一架构：运行时 wheel 把 `dsh` CLI 打包为 `deepseek-harness-sdk-runtime-<platform>-<arch>`，客户端默认以显式 Harness home 启动 `dsh --profile sdk`。
+
+## 核心包
+
+| 包 | 职责 | `ctx` 键 |
+|---|---|---|
+| `core/session` | 仅追加的 `SessionEvent` 日志和内存存储 | `ctx.sessions` |
+| `core/system-prompt` | 提示词片段与工具 schema 的组装 | `ctx.systemPrompt` |
+| `core/tools` | 作用域化的工具注册表和带把关的执行流水线 | `ctx.tools` |
+| `core/agent` | `Agent` 接口、活跃 agent 注册表、`agent/*` 事件 | `ctx.agents` |
+| `core/agent-loop` | 默认 agent loop 驱动器 | `ctx.agentLoop` |
+| `core/scope` | 按 agent 划分作用域的注册原语 | 库（无 ctx 键） |
+| `llm/llm` | 消息与流式词汇表、适配器 seam | `ctx.llm` |
+
+## 事件（扩展点）
+
+事件就是扩展点，选对事件域是大多数改动的第一个决定：
+
+- **会话事件**：追加到日志并通过 `session/event` 广播的持久事实。需要 reload 后仍存在的事实用它。
+- **Agent 事件（`agent/*`）**：携带活跃 `Agent`：inbox、步骤、状态、请求、验证、续跑。观察或拦截进行中的工作用它。
+- **能力事件**：无需导入循环即可向 seam（`fs/*`、`tools/*`、`telemetry/*`）附加策略和适配器。
+
+## 轮次流程（Turn Flow）
+
+- **步骤（step）**：一次模型请求 + 它调用的工具。
+- **轮次（turn）**：零个或多个步骤，领取首条输入时打开，不再欠工作时关闭。
+
+简化流程：`turn/start` → 领取输入 → 组装提示词 + 工具 schema → `agent/pre-step` → `step/start` → `agent/request` → 流式请求（`llm/stream` / `agent/assistant-stream`）→ 工具调用（`tools/*`）→ `step/end` → … → `turn/end`。
+
+关键点：
+- `turn/*`、`step/*`、`system/message`、`user/message`、`assistant/message`、`assistant/attempt`、`tool/*` 是**持久会话事件**；其余是实时扩展点。
+- `agent/pre-step`、`agent/request`、`llm/stream`、三个 `tools/*` 事件是 **waterfall** 事件，监听器必须调用 `next()` 才能委托下去；`agent/turn-stopping` 是 serial 事件。
+
+## 会话日志
+
+**模型可见即已记录**：每个模型请求都必须能从日志重建。新增模型可见输入需要会话事件。
+
+- `deriveMessages()` 从日志投影出模型历史。
+- 每个 `assistant/message` 嵌入其精确压缩的 stream；`assistant/attempt` 保留失败、重试、取消等 attempt，不加入模型历史。
+- fork、恢复、transcript、遥测、持久化都从这些持久 settlement 派生。
+- 文件格式：JSONL v0 用 `session.jsonl[.zstd]`；v1+ 用 `session.vN.jsonl[.zstd]`。
+
+## 能力 Seam
+
+**seam** 是一项可替换能力，包含三种角色：
+1. **Service Definition**（声明接口，拥有自己的 `ctx.<key>` 的 Cordis Service）
+2. **Service Provider**（实现它）
+3. **Consumer**（使用它，通常是面向模型的工具）
+
+一个包可以合并承担多个角色，但单一角色本身不是 seam；添加一项能力意味着把三者一并设计。
+
+经典范例（shell）：`dsh-shell`（Definition）+ `dsh-bash-local` / `dsh-bash-sandbox`（Providers）+ `dsh-tool-bash`（Consumer）。
+
+**seam 正是替换一个提供方就能改变整个产品的原因**：文件系统与进程提供方共享同一个执行世界，把指向远程沙箱，Bash、PTY、LSP 也一并搬了过去。
+
+## 新行为的归属位置（速查表）
+
+| 目标 | 机制 |
+|---|---|
+| 添加模型提供方 | 在 `ctx.llm` 上注册适配器 |
+| 添加面向模型的能力 | 在 `ctx.tools` 上注册；schema 加入提示词组装 |
+| 添加 shell 执行 | 注册 `ctx.shell` 后端 |
+| 添加用户命令 | 在 `ctx.commands` 上注册（无需模型轮次即可分派） |
+| 管理后台任务 | 在 `ctx.jobs` 上注册 |
+| 添加文件系统访问或策略 | 注册 `ctx.fs` 提供方，或监听 `fs/*` 事件 |
+| 限制所启动的进程 | 使用 `ctx.sandbox` 后端 |
+| 拦截请求、工具或轮次 | 使用 `agent/*` 或 `tools/*` 事件 |
+| 添加模型可见上下文 | 调用 `agent.inject()` |
+| 生成会话标题 | 注册唯一的 `ctx.sessionTitle` 提供方 |
+| 在新后端存储会话 | 实现 `SessionPersistence`（create/open/stat/list/export） |
+
+扩展实操：官方 [extension-cookbook](https://github.com/deepseek-ai/deepseek-harness/blob/main/docs/cookbook/extension-cookbook.zh.md) 将功能映射到能力，并索引添加包、工具、LLM 适配器、设置页的分步指南。
+
+<!-- ====================== docs/plugins.md ====================== -->
+
+# 插件机制与开发
+
+> 来源：docs/cordis-primer.zh.md、docs/architecture.zh.md（MIT License）。
+
+## Cordis 五个核心概念
+
+1. **插件是实现 Service 的对象**：可以是带可选 `inject` 和 `apply(ctx)` 字段的函数，也可以是 `Service` 子类，生命周期由 Cordis 挂载到当前上下文。
+2. **上下文是服务的容器**：一个服务占据稳定的 `ctx.<key>`（如 `ctx.tools`、`ctx.llm`、`ctx.sessions`）；其他插件通过 key 查找服务，而非导入具体实现。
+3. **通过 `inject` 声明服务依赖**：插件声明所需服务后等待其就绪再启动；加载顺序用服务依赖表达，而非手动编排。
+4. **类型化事件用于通信**：用 TypeScript 声明合并注册事件名，按 `emit` / `waterfall` / `parallel` / `serial` / `bail` 分发。
+5. **注册是可逆的副作用**：提示词片段、工具 schema、适配器、提供方、监听器通过 `ctx.effect()` 或 `ctx.on()` 安装，reload 和 teardown 时按预期撤销。
+
+## 事件分发模式
+
+| 模式 | 是否 await | 顺序 | 返回值 |
+|---|---|---|---|
+| `emit` | 否 | 按注册顺序观察 | 无 |
+| `waterfall` | 否 | 按注册顺序观察（包装） | 有 |
+| `parallel` | 是 | 所有监听器并行 | 无 |
+| `serial` | 是 | 按注册顺序 | 有 |
+| `bail` | 否 | 按注册顺序，直到某监听器返回 bail 值 | 有 |
+
+**Waterfall 语义**：`ctx.waterfall` 是环绕中间件。监听器接收 `(...args, next)`，调用 `next()` 执行下游；下游返回值通过 `next()` 返回当前包装层。不调用 `next()` 直接返回则短路。策略监听器在拥有决策权时可以不调用 `next()` 直接返回；仅做标注/观察的监听器必须委托。仅在必须早于普通注册运行时才用 `prepend: true`。
+
+## 实践规则
+
+- 将行为封装为插件：工具流水线事件属于 `ctx.tools`，模型流式输出属于 `ctx.llm`，实时 agent 协调属于 `ctx.agents`。
+- 拦截和策略优先用事件；直接能力调用优先用服务方法。
+- 每个注册都有对应 disposer：从 `ctx.effect()` 返回一个，或用 Cordis 辅助方法自动处理。teardown 有顺序要求时，把相关工作放进同一个 effect。
+
+## 添加能力的三种常规路径
+
+| 想做什么 | 怎么做 |
+|---|---|
+| 添加工具 | 在 `ctx.tools` 上注册工具；schema 自动加入提示词组装 |
+| 添加 LLM 适配器 | 在 `ctx.llm` 上注册适配器 |
+| 添加设置页 | 注册设置卡片（见官方 cookbook `adding-a-settings-card`） |
+
+## 安装 / 分发插件
+
+```sh
+dsh plugin --profile web add <package-name>          # 从 registry 安装
+dsh plugin --profile web add file:/path/to/plugin     # 从本地目录安装
+dsh plugin --profile web remove <package-name>        # 卸载
+```
+
+- 插件安装后会记录到该 profile，重启生效。
+- 给插件仓库添加 [`dsh-plugin`](https://github.com/topics/dsh-plugin) topic 便于被发现。
+- 插件可以用 `dsh.bundle` 字段声明 `cordis.patch.yml` 形式的 patch 层，用 `dsh.client` 字段声明注入的客户端模块（如 `dsh-client-ui-model-selection`）。
+
+## 官方学习资源
+
+- [Cordis 入门](https://github.com/deepseek-ai/deepseek-harness/blob/main/docs/cordis-primer.zh.md)
+- [Cordis 教程（7 步实操）](https://github.com/deepseek-ai/deepseek-harness/blob/main/docs/cordis-tutorial/index.zh.md)：first-plugin → lifecycle → services → events → config → composition/HMR → into-the-harness
+- [扩展实操手册](https://github.com/deepseek-ai/deepseek-harness/blob/main/docs/cookbook/extension-cookbook.zh.md)
+
+<!-- ====================== docs/configuration.md ====================== -->
+
+# 配置体系
+
+> 来源：docs/architecture.zh.md、docs/user/guide/providers.zh.md（MIT License）。
+
+## Harness Home（`$DSH_HOME`）
+
+- 默认位置：`~/.dsh`。
+- 存放内容：`profiles/`（各 profile 目录）、`.credentials.yaml`（凭据，权限 600）、插件、会话、缓存等。
+- **隔离**：需要隔离 profile、插件、凭据、设置与会话时，使用新的 home（例如显式 `DSH_HOME=/path/to/home`）。
+
+## profiles 与 cordis.patch.yml
+
+每个 profile 是一个目录（如 `$DSH_HOME/profiles/web/`），核心文件：
+
+- `cordis.patch.yml`：用户的配置覆盖（模型页写入的就是它，也可直接编辑）。
+- 已安装的插件（通过 `dsh plugin` 管理）。
+
+**直接编辑 profile patch 示例**：
+
+```yaml
+# $DSH_HOME/profiles/web/cordis.patch.yml
+- id: llm-pi-ai
+  config:
+    providers:
+      my-gateway:
+        apiKeyEnv: GATEWAY_API_KEY
+        api: openai-completions
+        baseURL: https://gateway.example/v1
+        models:
+          - id: my-model
+```
+
+> 注意：Cordis 配置覆盖会**替换完整条目配置**；编辑已有覆盖项时，请保留其他 provider 和字段。
+
+## Patch 分层顺序
+
+```
+profile 中有序的组合包
+  → profile 的 cordis.patch.yml
+  → home patch
+  → --patch overlay（命令行传入，可重复）
+```
+
+patch 按 id 定位条目并替换其整个 config，或插入新条目。
+
+## 配置目录（config-catalog）
+
+官方自动生成的[配置目录](https://github.com/deepseek-ai/deepseek-harness/blob/main/docs/config-catalog.zh.md)（`config-catalog.zh.md`）列出每个插件的所有受支持字段与默认值，派生自源码，不会落后于适配器实际接受的内容。
+
+## 凭据
+
+- 模型页保存的密钥是**只写**的：页面只收到脱敏描述符，永远收不到明文密钥。
+- 密钥存储在 `$DSH_HOME/.credentials.yaml`，settings 只保留凭据引用。
+- 密钥留空时使用已保存凭据，或回退读取环境变量（如 `DEEPSEEK_API_KEY`）。
+
+## 常用环境变量
+
+| 变量 | 用途 |
+|---|---|
+| `DSH_HOME` | Harness home 路径（默认 `~/.dsh`） |
+| `DEEPSEEK_API_KEY` | DeepSeek API 密钥 |
+| `DEEPSEEK_BASE_URL` | DeepSeek 兼容 endpoint（使用代理时设置） |
+| `DSH_SYSTEM_PROMPT` | sdk-minimal 等 profile 的系统提示词覆盖 |
+| `DSH_MODEL` | minimal 示例的模型覆盖 |
+
+## 调试工具
+
+```sh
+dsh --profile web --dump-config          # 打印组合后的配置树
+dsh --profile web --dump-default-config  # 打印不含用户层的配置树
+dsh --profile web --dump-config-schema   # 打印 JSON Schema
+```
+
+<!-- ====================== docs/models.md ====================== -->
+
+# 模型提供商配置
+
+> 来源：docs/user/guide/providers.zh.md（MIT License）。模型变更在下一次请求时生效，不需要重启服务器。
+
+## 配置 DeepSeek
+
+打开 **设置 → 模型**，DeepSeek 卡片提供 API 密钥字段，输入并保存。密钥只写，存于 `$DSH_HOME/.credentials.yaml`。
+
+## 第三方提供商
+
+「添加模型提供商」→ 选择 dsh 自带提供商（列表显示 provider id）：
+
+- `anthropic`、`openai`、`moonshotai`（Kimi）、`zai`（GLM）等
+- 输入 API 密钥并保存；已安装目录会提供端点、协议和模型列表。
+
+密钥留空时：使用已保存凭据 → 或尝试读取列出的环境变量。认证状态有三种提示：绿色（已检测到环境变量）、黄色（未检测到凭据变量）、未确认（读取失败）。
+
+## 自定义模型 API（中转站 / 公司网关 / 自建）
+
+把卡片切换到**自定义模型 API**，填写：
+
+- **Provider ID**（小写，永久标识；重命名需新建并删除旧提供商）
+- 基础 URL
+- **API 协议**（必须选网关实际使用的）：`OpenAI Chat Completions`、`OpenAI Responses`、`Anthropic Messages`（在 `cordis.patch.yml` 中存为 `openai-completions` / `openai-responses` / `anthropic-messages`）
+- 凭据和至少一个模型
+
+**探测模型**：在模型目录选「获取可用模型」询问端点；探测只是便利手段，失败时手动添加模型 ID 效果一样。
+
+## 图片输入
+
+在模型「模型选项」勾选「图片」。Pi-ai 保存为 `input: [text, image]`；DeepSeek 适配器保存为 `inputModalities`。可设路由级回退 `defaultInput: [text, image]`。声明了端点并不提供的图片能力不会被拦下，改由提供商拒绝请求。
+
+## 推理等级（Reasoning）
+
+- 内置提供商模型从已安装目录继承等级；DeepSeek 模型提供 `off`、`low`、`high`、`max`。
+- 自定义模型可声明 `reasoningEfforts` 档位，值是该档位在协议上以 `reasoning_effort` 发送的写法。
+- 只有 `off` 可以留空（不传参）。「不明确关闭就会思考」的 OpenAI 兼容网关（如 DeepSeek V4）需要 `compat.thinkingFormat: deepseek`。
+- DeepSeek 自身路由：`llm-deepseek.reasoningEffort` 设置选择器起始默认值（如 `max`）。
+
+```yaml
+- id: llm-deepseek
+  config:
+    reasoningEffort: max
+```
+
+## 请求兼容性（compat）
+
+多数 OpenAI 兼容网关会拒绝 OpenAI 接受的某些东西，两个高频问题：
+
+1. 推理模型的系统提示词以 `role: "developer"` 发出 → 网关拒绝 → 设 `compat.supportsDeveloperRole: false`
+2. 输出上限写 `max_completion_tokens` → 只认 `max_tokens` 的服务端拒绝 → 设 `compat.maxTokensField: max_tokens`
+
+```yaml
+- id: llm-pi-ai
+  config:
+    providers:
+      my-gateway:
+        apiKeyEnv: GATEWAY_API_KEY
+        api: openai-completions
+        baseURL: https://gateway.example/v1
+        compat:
+          supportsDeveloperRole: false
+          maxTokensField: max_tokens
+        models:
+          - id: my-model
+```
+
+路由的 `compat` 是模型默认值，模型自身逐字段胜出。写下的开关必须给值（冒号后留空会被拒绝）。
+
+## 排错速查
+
+| 错误 / 现象 | 处理 |
+|---|---|
+| `MISSING_CREDENTIAL` | 存储提供商密钥，或提供被引用的环境变量 |
+| `UNKNOWN_MODEL` | 选择已配置的模型，或向自定义提供商添加缺失模型 |
+| 获取可用模型 401 | 检查密钥（探测调用 `GET /models`） |
+| 密钥地址都对但网关拒绝一切请求 | 设 `compat.supportsDeveloperRole: false` + `compat.maxTokensField: max_tokens` |
+| 只有推理模型失败 | 设 `compat.supportsDeveloperRole: false`（developer 角色被拒） |
+| `off` 无法让 DeepSeek 停止思考 | 设 `compat.thinkingFormat: deepseek` |
+| 图片发送前被拒绝 | 模型未声明图片模态：自定义提供商加 `input: [text, image]` |
+| 提供商拒绝带图请求 | 模型声明了端点不提供的图片能力，移除 `image` 并开新会话 |
+
+## DeepSeek 账号模型
+
+已登录 DeepSeek 账号的模型列表来自账号服务，用 `modelOverrides` 调整单个模型：
+
+```yaml
+- id: llm-deepseek-account
+  config:
+    modelOverrides:
+      deepseek-flash:
+        contextWindow: 524288
+        maxTokens: 131072
+```
+
+<!-- ====================== docs/sdk.md ====================== -->
+
+# Python SDK
+
+> 来源：docs/user/guide/python-sdk.zh.md（MIT License）。
+
+## 前置条件
+
+- Python 3.10+
+- Git
+- Linux x64 / Linux arm64 / macOS 14+ (arm64) / Windows x64
+- DeepSeek 兼容的 API endpoint 与凭据
+- 隔离的 workspace 与隔离的 Harness home
+
+## 安装
+
+```sh
+git clone https://github.com/deepseek-ai/deepseek-harness.git
+cd deepseek-harness
+python -m venv .venv
+. .venv/bin/activate
+python -m pip install deepseek-harness-sdk
+```
+
+安装内容包含匹配的原生运行时 wheel 与 `dsh` 命令——**普通 SDK 运行不需要系统 Node.js**。
+
+## 运行示例
+
+```sh
+export DEEPSEEK_API_KEY=sk-your-key-here
+# export DEEPSEEK_BASE_URL=http://127.0.0.1:8000/v1   # 使用兼容代理时
+
+python python/sdk/examples/minimal.py \
+  --workspace /absolute/path/to/disposable-workspace \
+  --dsh-home /absolute/path/to/example-dsh-home \
+  --session-id example-001 \
+  "Inspect the repository and fix the failing tests."
+```
+
+脚本打印最终 assistant 响应；所选 home 会保存生成的 `sdk-minimal` profile、已安装插件和 `sessions/` 下的未压缩 JSONL 会话日志。**示例与 SDK 绝不会静默读取 `~/.dsh`。**
+
+## 在程序中使用
+
+```python
+from pathlib import Path
+
+from deepseek_harness import DeepSeekHarness
+
+workspace = Path("/absolute/path/to/disposable-workspace").resolve()
+dsh_home = Path("/absolute/path/to/example-dsh-home").resolve()
+with DeepSeekHarness(
+    provider="deepseek-official",
+    model="deepseek-v4-flash",
+    max_tokens=49_152,
+    cwd=str(workspace),
+    dsh_home=str(dsh_home),
+    profile="sdk-minimal",
+) as harness:
+    result = harness.run(
+        "Inspect the repository and fix the failing tests.",
+        session_id="example-001",
+    )
+
+print(result.final_response)
+```
+
+SDK 延迟启动内置的 `dsh --profile sdk-minimal` 进程，并复用到上下文管理器退出。
+
+## 安装 / 定义插件
+
+```sh
+export DSH_HOME=/absolute/path/to/example-dsh-home
+dsh --profile sdk-minimal --dump-default-config >/dev/null   # 初始化 profile
+dsh plugin --profile sdk-minimal add file:/path/to/my-plugin-bundle
+```
+
+持久配置项变更编辑 `$DSH_HOME/profiles/sdk-minimal/cordis.patch.yml`；单次启动变更从 Python 传 `patches=(...)`。
+
+### 显式启用 `str_replace_editor`
+
+随附运行时包含该工具但 `sdk-minimal` 默认不挂载。保存 `editor.patch.yml`：
+
+```yaml
+- insert:
+    - id: tool-str-replace-editor
+      name: '@deepseek-ai/dsh-tool-str-replace-editor'
+```
+
+构造时传 `patches=("/path/to/editor.patch.yml",)`，或写入 `cordis.patch.yml` 持久保存。
+
+## sdk-minimal profile 速查
+
+| 属性 | 值 |
+|---|---|
+| 系统提示词 | `DSH_SYSTEM_PROMPT`，未设置时 `You are a helpful software engineer assistant.` |
+| 默认模型 | `--model` → `DSH_MODEL` → `deepseek-v4-flash` |
+| 面向模型的工具 | 持久 `bash`（Windows 为 `pwsh`）、`read_image`、`working_directory` |
+| Shell 超时 | 300 秒 |
+| 上下文压缩 | 自动执行（额外请求生成较早历史摘要） |
+| 会话持久化 | `<dsh_home>/sessions` 下未压缩 JSONL |
+| 权限 | 固定 `danger-full-access`，应使用一次性 checkout 或容器 |
+
+注意：`sdk-minimal` 不包含 `dsh-base`，因此基础 profile 以后新增的工具不会隐式出现；它没有 settings、托管凭据、OTel、Web 工具、subagent 等。默认随 DeepSeek 请求上传未接受的日志事件（`session-log-deepseek`，每次请求最多 8 MiB），可在 profile patch 中 `session-log-deepseek.enabled: false` 关闭。
+
+<!-- ====================== docs/glossary.md ====================== -->
+
+# 术语表
+
+> 来源：docs/glossary.zh.md（MIT License）。DeepSeek Harness 领域词汇的规范术语速查。
+
+## 能力
+
+- **seam（能力接缝）**：一种包含三种角色的*可替换能力*——**Service Definition**（拥有自身 `ctx.<key>` 和词汇类型的 Cordis Service）、一个或多个 **Service Provider**、一个或多个注入该服务的 **Consumer**。范例：`dsh-shell`（Definition）+ `dsh-bash-local` / `dsh-bash-sandbox`（Providers）+ `dsh-tool-bash`（Consumer）。
+
+## Agent 作用域
+
+- **scope**：按 agent 划分的注册单位。贡献要么全局，要么带作用域（归属恰好一个 scope key）。只有两层、扁平结构：带作用域的注册不会向下继承给 subagent。
+- **scope key**：scope 的不透明标识，按对象同一性比较；约定：活跃 agent 就是其自身 scope 的 key。
+- **agent 上下文（`agent.ctx`）**：agent 的带作用域上下文；注册既具备 scope 可见性，生命周期也绑定该 scope。
+- **shadowing**：最具体者胜出的名称解析——带作用域的工具/片段/变量仅在该 scope 内替换同名全局项。按 agent 定制 persona / 工具变体的机制。
+- **restriction / scope-local 注册**：`tools.restrict` 为单个 scope 过滤全局工具集合；scope-local 注册在过滤后合并。被过滤掉的工具不出现在提示词中，也拒绝执行。
+- **setup window**：创建者组装 agent 作用域环境的创建时隙（`CreateAgentOptions.setup`），此时 scope 和 agent 已存在但尚未发布。
+- **lineage**：以数据形式携带的父子关系事实（`parentSession`、`delegationDepth`、`subagentDepth`），不影响可见性。
+
+## 目标（Goals）
+
+- **目标**：附着在现有会话上的持久完成目标，带 `active / paused / blocked / complete` 阶段和 Goal Round 上限；`blocked` 保留策略代码与说明。目标是状态，不是调度器。
+- **Goal Round**：为当前目标接纳的一次续行周期，具体化为一个由目标触发的轮次。
+- **目标激活**：续行消费方接纳下一个 Goal Round 的进程本地权限，`armed` / `disarmed`；不参与持久回放，恢复或 fork 后需经 `/goal` 或模型工具做人类授权的恢复变更。
+
+## 人类命令
+
+- **人类命令**：以 `/` 开头的指令，由面向人类的适配器通过 `ctx.commands` 解释执行，不会成为模型消息。
+- **目标命令**：`/goal` 由 `dsh-command-goal` 提供，直接观察或更改当前目标。
+
+## 循环层级
+
+- **轮次（turn）**：会话中一次对已接纳输入的排空过程，模型及其工具停止工作或终止策略介入后结束。
+- **步骤（step）**：一次模型请求 + 由响应引发的工具执行；一个轮次包含零个或多个步骤。
+- **Round**：承载轮次的外层策略迭代（如 Goal Round、Ralph 尝试）；Round 计数器归策略所有。
+- **交互段（exchange）**：连续的轮次，从首个步骤接纳真人输入的轮次起，到下一个这样的轮次为止；通知唤醒的轮次归入前面的交互段。
+
+## Ralph
+
+- **Ralph 循环**：一次面向不可变目标的前台全新 agent 工作流运行，由工作流和 subagent 原语组合而成的面向模型的工具策略。
+- **Ralph Round**：Ralph 循环中的一个全新子会话；不接收父会话或此前子会话的对话种子，共享工作区 + 有界 Ralph 交接承载跨 Round 状态。
+- **Ralph 交接（handoff）**：从一个仍需继续的 Ralph Round 传给下一个的规范化、有界结构化报告（状态、摘要、证据、后续步骤、阻塞说明）。
+
+<!-- ====================== projects/README.md ====================== -->
+
+# 个人项目索引
+
+本目录收录作者（xiexie512）基于 DeepSeek Harness 构建的个人项目文档。所有项目源码位于本机 `~/Desktop/DeepSeek/`。
+
+| 项目 | 一句话说明 | 文档 |
+|---|---|---|
+| dsh-pet | 住在 DeepSeek Harness 里的桌面宠物（npm 发布、开源） | [dsh-pet.md](dsh-pet.md) |
+| dsh-phone | 手机远程访问 dsh Web UI 的一键管理脚本 | [dsh-phone.md](dsh-phone.md) |
+| qqbot | AstrBot + NapCat 的 QQ 机器人 Docker 部署 | [qqbot.md](qqbot.md) |
+| douyin-bot | Playwright 自动刷抖音 + DeepSeek 决策 + QQ 播报 | [douyin-bot.md](douyin-bot.md) |
+| workspace-sync | 容器与宿主机挂载健康确认服务 | [workspace-sync.md](workspace-sync.md) |
+| dsh-zhipu-model-label | 智谱模型【免费/付费】标签 DSH 客户端插件 | [zhipu-model-label.md](zhipu-model-label.md) |
+
+## 目录位置
+
+```
+~/Desktop/DeepSeek/
+├── dsh-pet/                # 桌宠项目（含发布版插件子目录）
+├── dsh-phone.sh            # 手机远程访问脚本
+├── qqbot/                  # QQ 机器人部署
+├── douyin-bot/             # 抖音自动刷服务 + AstrBot 桥
+├── workspace-sync/         # 同步确认服务
+├── dsh-zhipu-model-label/  # 智谱标签插件
+└── dsh-phone.log / .dsh-phone.pid 等运行态文件
+```
+
+## 安全说明
+
+> 本项目文档已做脱敏：**任何密钥、口令均不进入本知识库**。项目源码中若仍存在明文凭据（例如旧版脚本中的 API Key），建议迁移到环境变量或 `.credentials.yaml`，并轮换已暴露的密钥。
+
+<!-- ====================== projects/dsh-pet.md ====================== -->
+
+# dsh-pet：DeepSeek Harness 桌面宠物
+
+> 作者项目（本机：`~/Desktop/DeepSeek/dsh-pet`），已发布 npm 包 `dsh-pet`，开源仓库 https://github.com/PC2005-cloud/dsh-pet
+
+一只住在 DeepSeek Harness 里的桌面宠物：待机呼吸、随机动作（打瞌睡、玩魔方、吃火锅……）、左右转向、屏幕漫游、点击 Q 弹、拖拽甩抛反弹、右键菜单点播——一百余个透明动画无缝衔接；跟随 DSH 会话事件切换工作状态动画、按档位播放余额动画 + 头顶气泡、碎碎念与对话聊天、窗口失焦弹系统通知。支持多开同屏、脱离浏览器住上桌面（透明置顶小窗）、添加全新宠物种类（pet pack）。
+
+## 项目定位（三件套）
+
+```
+① 提示词（配方）  →  ② 素材生成链（引擎）  →  ③ 插件（成品）
+AI 生成动画的配方    源视频 → 透明动画的管线    运行在 DSH 里的宠物
+```
+
+任何人 clone 该仓库都可以从零生成自己的桌面宠物——换角色、换动作、换风格，全流程可复现。
+
+## 安装
+
+```sh
+# 前置：Node.js；全局装 dsh 启动器与 pnpm
+npm install -g @deepseek-ai/dsh pnpm
+
+# web 模式
+dsh plugin --profile web add dsh-pet
+```
+
+- 桌面应用（Electron）版：在应用内「插件管理」页安装框填 `dsh-pet`。
+- 从源码安装：clone 后 `cd dsh-pet/dsh-pet && npm install && npm run build`，再 `dsh plugin --profile web add file:/path/to/dsh-pet/dsh-pet`。
+- **兼容性**：在 dsh `0.2.1-rc.2` 下开发测试（知识库编写时环境为 `0.2.1-rc.3`）。
+- 装完需**重开** `dsh web` / 桌面应用生效。宠物出现在界面右上角（设置页可改角落）。
+
+## 主要功能
+
+- **动画链**：每个动画播完按权重选下一个（默认 idle 10 / turn 5 / move 5 + 分类权重，`config.jsonc` 可调），双缓冲交叉淡入无空白帧。
+- **事件动画**：余额 / 碎碎念 / 工作状态按档位触发专属动画；档位支持候选数组，触发时随机、循环自动轮换。
+- **多开**：同屏多个宠物，各自独立大小与位置。
+- **屏幕漫游**：先探测空间、不走出屏幕（多屏按各屏边界；可锁定当前屏幕）。
+- **点击 / 拖拽 / 甩抛**：纯函数物理（`src/shared/physics.ts`），过阻尼弹簧跟手、抛物线飞行、边缘反弹、落地摩擦 Q 弹。
+- **右键菜单**：动作点播 + 工具项（碎碎念 / 对话 / 回到初始位置 / 打开网站 / 查看余额 / 重载配置）。
+- **桌面模式（可选）**：每只宠物一个独立透明置顶小窗，与浏览器严格同行为。宿主自动下载 Electron 到 `~/.dsh/electron`（同一版本只下一次，默认 npmmirror 镜像；可用 `DSH_PET_ELECTRON_PATH` / `DSH_PET_ELECTRON_MIRROR` / `DSH_PET_ELECTRON_VERSION` 控制）。
+- **余额展示**：按已用百分比分档播余额动画 + 头顶气泡；DeepSeek 显示账户余额，OpenCode Zen Go 与 Command Code 显示最紧迫额度窗口；未登记接口的服务商改为弹文字说明。
+- **碎碎念与对话**：周期自动生成一句；对话记忆持久化（浏览器 / 桌面共享）。
+- **工作状态联动**：监听 DSH 会话事件切「思考 / 工作 / 整理 / 等待 / 成功 / 出错」动画；多轮任务只在真正收尾轮庆祝。
+- **系统通知**：窗口失焦时弹 toast（对话完成 / 生成失败 / 输出截断 / 权限申请 / 用户选择）。
+- **pet pack（额外宠物种类）**：`pet/` 下建 `种类名-config.json` + `种类名-animation/` 即新增全新种类。
+- **自定义动画**：往 `main-animation/webm/` 放 VP9-Alpha 的 `.webm` 即为新动画。
+
+## 对外 Cordis 服务
+
+同名服务 `petApi7340` 在宿主进程 / DSH web 页面各有一份（分属不同容器，互不可见）：
+
+```js
+ctx.get('petApi7340')
+```
+
+- 客户端半侧（DSH web 页面内）：
+  - `pose(petId)` → `{ x, y, facing } | null`（视口归一化坐标）
+  - `progress(...)` 等进度接口
+
+## 相关文件
+
+- `README.md` / `CONFIG.md` / `CORDIS.md` / `API.md` / `MAKE-YOUR-OWN-PET.md`
+- `prompts/`（动画配方）、`tools/cordis-probe`（Cordis 探测工具）、`video/`（素材）
+- 发布版插件位于 `dsh-pet/dsh-pet/`（构建产物 `lib/`）
+
+<!-- ====================== projects/dsh-phone.md ====================== -->
+
+# dsh-phone：手机远程访问 dsh
+
+> 作者项目（本机：`~/Desktop/DeepSeek/dsh-phone.sh`），一键管理脚本。
+
+## 原理
+
+启动 DeepSeek Harness 自带的 **web profile**（浏览器 UI），绑定到指定网卡，手机通过 **Tailscale / 局域网**访问。首次访问用 URL 里的 token 换取 **30 天有效期的签名 Cookie**，之后直接使用。
+
+## 用法
+
+```sh
+./dsh-phone.sh start [ip]        # 启动并打印手机访问 URL（ip 缺省自动选择）
+./dsh-phone.sh stop              # 停止服务
+./dsh-phone.sh status            # 查看运行状态与访问地址
+./dsh-phone.sh url               # 重新打印当前访问 URL（含 token）
+./dsh-phone.sh start --lan       # 强制绑定局域网 IP（仅同 Wi-Fi 可访问）
+./dsh-phone.sh autostart         # 安装开机自启（登录后自动启动，launchd）
+./dsh-phone.sh no-autostart      # 移除开机自启
+```
+
+**地址自动选择顺序**：Tailscale IP > 局域网 IP（`--lan` 强制局域网）。
+
+## 实现要点
+
+- 复用桌面应用自带运行时：`/Applications/DeepSeek Harness.app` 内捆绑的 `node` 与 `dsh` 二进制，无需额外安装 Node。
+- 端口默认 `3080`（可用环境变量 `DSH_PHONE_PORT` 覆盖）。
+- 日志 `~/Desktop/DeepSeek/dsh-phone.log`，PID 文件 `.dsh-phone.pid`。
+- 开机自启：`~/Library/LaunchAgents/com.deepseek-harness.phone.plist`。
+
+## 适用场景
+
+- 手机 / 平板通过 Tailscale 组网远程使用 dsh Web UI。
+- 不暴露公网端口（走 Tailscale 或局域网），降低暴露面。
+
+<!-- ====================== projects/qqbot.md ====================== -->
+
+# qqbot：AstrBot + NapCat QQ 机器人
+
+> 作者项目（本机：`~/Desktop/DeepSeek/qqbot`），Docker Compose 组合部署，源自 NapCat 官方 compose 并适配 **Mac arm64**。
+
+## 架构
+
+```
+NapCat（QQ 协议端，端口 6099）
+  └─ MODE=astrbot 模式，与 AstrBot 联动
+AstrBot（机器人框架，端口 6185，管理面板 http://127.0.0.1:6185）
+  ├─ ./data            → /AstrBot/data        （AstrBot 数据）
+  ├─ ./napcat/config   → /app/napcat/config   （NapCat 配置）
+  ├─ ./ntqq            → /app/.config/QQ      （QQ 登录态）
+  └─ ../（宿主机 ~/Desktop/DeepSeek）→ /DeepSeek（双向实时挂载）
+```
+
+- 镜像走 `m.daocloud.io` 加速源：`mlikiowa/napcat-docker:latest`、`soulter/astrbot:latest`
+- 网络：bridge `astrbot_network`；NapCat 固定 MAC `02:42:ac:11:00:02`。
+
+## 启动
+
+```sh
+cd ~/Desktop/DeepSeek/qqbot
+docker compose up -d
+```
+
+## 管理脚本
+
+```sh
+./manage.sh start|stop|restart|status|logs|astrbot|napcat|url|换码
+```
+
+- `status`：查看两个容器状态
+- `url`：打印 AstrBot 面板地址与 NapCat WebUI token（脱敏：口令不写入知识库）
+- `换码`：重启 NapCat 等待二维码生成，拷贝 `qrcode.png` 到本地并用系统看图打开——QQ 登录换码流程
+- `douyin` 子命令：管理刷抖音服务（见 [douyin-bot.md](douyin-bot.md)）
+
+## 关键点
+
+- 宿主机 `~/Desktop/DeepSeek` 整个文件夹挂载进容器 `/DeepSeek`——**挂载即同步**，任一边改动另一边实时可见，无需复制。
+- QQ 登录态持久化在 `./ntqq`；需要重新登录时用「换码」刷新二维码。
+- 定时任务 / 触发式能力由 AstrBot 插件实现，回答完调用同步确认服务（见 [workspace-sync.md](workspace-sync.md)）。
+
+<!-- ====================== projects/douyin-bot.md ====================== -->
+
+# douyin-bot：自动刷抖音 + DeepSeek 决策 + QQ 播报
+
+> 作者项目（本机：`~/Desktop/DeepSeek/douyin-bot`），FastAPI 服务（端口 8787）。
+
+## 架构
+
+```
+Playwright（复用系统 Chrome，有头模式，独立 profile 持久化登录态）
+  → 每刷一条视频：提取 标题/作者/点赞/评论 纯文本
+  → 调 DeepSeek（纯文本 JSON 判断）
+  → 动作：点赞 / 评论 / 划走 / 停止
+  → 播报文本进 pending 队列
+  → AstrBot 插件（astrbot_plugin_douyin_bridge）轮询转发到 QQ
+```
+
+## HTTP 接口
+
+| 接口 | 说明 |
+|---|---|
+| `POST /start?keyword=xxx` | 启动自动刷（可选搜索词） |
+| `POST /stop` | 停止 |
+| `POST /say?text=xxx` | 手动让机器人评论当前视频 |
+| `POST /click_like` | 手动点赞 |
+| `GET /status` | 状态 |
+| `GET /pending` | 取走待播报（消费式） |
+
+## 实现要点
+
+- `launch_persistent_context` 复用系统 Chrome 与独立 profile（`chrome-profile/`），登录态持久化。
+- 深色水印风控规避：下滑间隔随机抖动（6–12 秒），按条数节流点赞/评论（`REPORT_EVERY=5` 等参数可调）。
+- 模型：DeepSeek `deepseek-flash`，纯文本 JSON 返回决策。
+- 管理入口：`qqbot/manage.sh douyin start|stop|restart|logs`。
+
+## 安全提示（重要）
+
+> 早期版本源码中曾以**明文**写入 DeepSeek API Key。知识库一律脱敏，请将凭据迁移到环境变量（如 `DEEPSEEK_API_KEY`），并**轮换已暴露的密钥**——尤其本目录如果纳入 git 管理，务必确认 `chrome-profile/`、`.env`、日志不包含密钥。
+
+<!-- ====================== projects/workspace-sync.md ====================== -->
+
+# workspace-sync：挂载健康确认服务
+
+> 作者项目（本机：`~/Desktop/DeepSeek/workspace-sync/sync_service.py`），FastAPI 服务。
+
+## 背景
+
+宿主机 `~/Desktop/DeepSeek` 已挂载进 astrbot 容器 `/DeepSeek`（**双向实时互通，挂载即同步**，无需 rsync）。本服务提供 `/sync` 做「挂载健康确认 + 触发时间记录」，供 AstrBot 插件在每次回答完后调用。
+
+## 接口
+
+| 接口 | 说明 |
+|---|---|
+| `GET /sync` | 确认挂载健康并记录触发时间（幂等） |
+| `GET /status` | 查看状态 |
+
+## 实现要点
+
+- 健康检查：确认宿主机目录存在且**可写**（创建临时探针文件再删除）。
+- 每 12 小时兜底巡检一次挂载健康（`SYNC_INTERVAL = 12 * 3600`）。
+- 状态字段：`last_trigger`（最近一次回答后触发时间）、`healthy`、`last_check`、`last_msg`。
+
+## 运行
+
+```sh
+<douyin venv>/bin/python sync_service.py
+```
+
+## 设计思路
+
+挂载本身是 Docker bind mount，天然实时同步；本服务不做数据复制，只做「健康确认 + 时间戳」两类事实的轻量服务，供上层（AstrBot 插件）在回答后打点，用于排查「改了一边没生效」类问题。
+
+<!-- ====================== projects/zhipu-model-label.md ====================== -->
+
+# dsh-zhipu-model-label：智谱模型标签插件
+
+> 作者项目（本机：`~/Desktop/DeepSeek/dsh-zhipu-model-label`），DSH 客户端 bundle 插件。
+
+## 作用
+
+在 DeepSeek Harness **模型选择器**中为智谱（GLM）模型显示【免费】/【付费】标签，并保留 DeepSeek-V4.1-Flash 的 1017 角标。
+
+## 实现
+
+- **类型**：ESM（`"type": "module"`），入口 `lib/index.js`，导出 `./client`（`lib/client.js`）。
+- **Cordis patch**（`cordis.patch.yml`）：
+  - 停用内置 `ui-deepseek-model-label-1017` 插件（其行为已并入本插件，避免 single slot 冲突）
+  - `insert` 挂载 `zhipu-model-label` 条目
+- **客户端注入**（`package.json` 的 `dsh.client`）：
+  - `@deepseek-ai/dsh-client-ui-model-selection`
+  - `@deepseek-ai/dsh-client-ui-renderer`
+  - `@deepseek-ai/dsh-client-locale`
+  - `platform: "web"`，`immediately: true`
+
+## 安装
+
+```sh
+dsh plugin --profile web add file:/path/to/dsh-zhipu-model-label
+```
+
+> 说明：本机 `~/.dsh` 中存在对应备份目录（`backup-zhipu-label-*`），升级/卸载前建议沿用该备份习惯。
+
+<!-- ====================== notes/README.md ====================== -->
+
+# 个人笔记
+
+这里存放作者（xiexie512）在使用 DeepSeek Harness 过程中的个人笔记：环境速查、踩坑记录、技巧。
+
+## 目录
+
+- [setup.md](setup.md)：本机环境速查（版本、目录、凭据位置）
+- [templates/issue-note.md](templates/issue-note.md)：踩坑记录模板
+
+## 约定
+
+- 笔记按「一篇一主题」组织，文件名用 `NN-主题.md` 编号。
+- 涉及密钥/口令的内容一律不写入本仓库（公开仓库）。
+- 官方文档可查证的内容尽量放进 `../docs/`，笔记只写「官方文档没写 / 需要实践验证」的部分。
+
+<!-- ====================== notes/setup.md ====================== -->
+
+# 本机环境速查（macOS）
+
+> 更新时间：2026-10-30。dsh 处于开发者预览阶段，版本迭代快，此页需随环境变化更新。
+
+## 版本
+
+| 组件 | 版本 | 说明 |
+|---|---|---|
+| `dsh`（CLI） | 0.2.1-rc.3 | `dsh --version` |
+| DeepSeek Harness 桌面应用 | 0.2.1-rc.3 | `/Applications/DeepSeek Harness.app` |
+
+## 目录布局
+
+| 路径 | 内容 |
+|---|---|
+| `~/.dsh` | Harness home（默认 `$DSH_HOME`） |
+| `~/.dsh/profiles/` | 已初始化的 profile：`desktop`、`headless`、`qqbot`、`web` |
+| `~/.dsh/.credentials.yaml` | 凭据（只写，权限 600） |
+| `~/.dsh/dsh-pet/` | dsh-pet 插件运行时数据 |
+| `~/.dsh/electron/` | dsh-pet 桌面模式下载的 Electron |
+| `~/deepseek-harness/` | 官方仓库源码克隆（含完整 docs） |
+| `~/Documents/deepseek-harness/` | dsh 默认工作区（default-workspace） |
+| `~/Desktop/DeepSeek/` | 个人项目集（dsh-pet / dsh-phone / qqbot / douyin-bot / workspace-sync / zhipu-label） |
+
+## 安装方式（本机）
+
+- 桌面应用（Electron）安装，自带签名 dsh 生产运行时（`$DSH_HOME/profiles/desktop`）。
+- 全局 npm CLI：`npm install -g @deepseek-ai/dsh pnpm`。
+- 源码克隆：`~/deepseek-harness`（`pnpm install` / `pnpm run build` / `pnpm dsh web`）。
+
+## 常用命令
+
+```sh
+dsh --version                         # 版本
+dsh --profile web --dump-config       # 查看组合配置树
+dsh plugin --profile web add <pkg>    # 安装插件（装完重启生效）
+dsh web                               # 启动 Web UI（默认 127.0.0.1:3080）
+```
+
+## 备份习惯
+
+`~/.dsh` 下保留 `backup-plugins-YYYYMMDD-HHMMSS`、`backup-zhipu-label-*`、`backup-pet-*` 等目录——**安装/升级/卸载插件前先备份对应目录**（沿用此习惯）。
+
+## 已知的个人项目依赖关系
+
+- `dsh-pet` 桌面模式依赖 `~/.dsh/electron`（版本 v43.x，npmmirror 镜像下载）。
+- `qqbot` 容器挂载 `~/Desktop/DeepSeek` → `/DeepSeek`（实时双向）。
+- `douyin-bot` 复用系统 Chrome profile（`chrome-profile/`），登录态持久化。
+
+<!-- ====================== notes/templates/issue-note.md ====================== -->
+
+# 踩坑记录模板
+
+> 用法：复制本文件为新笔记（`NN-主题.md`），按节填写；「结论」必须写清楚，供模型检索时直接引用。
+
+## 现象
+
+（描述你看到的行为 / 报错原文，尽量贴关键片段）
+
+## 环境
+
+- dsh 版本：
+- profile：
+- 相关插件：
+- 触发条件：
+
+## 排查过程
+
+1. （第 1 步：假设与验证）
+2. （第 2 步）
+3. （第 3 步：定位根因）
+
+## 根因
+
+（一句话说清楚为什么）
+
+## 解决方案
+
+```sh
+# 可复现的命令 / 配置片段
+```
+
+## 结论（供模型引用）
+
+- 一句话结论：
+- 关键词：`xxx` / `yyy`

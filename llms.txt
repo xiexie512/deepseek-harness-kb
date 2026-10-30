@@ -1,0 +1,41 @@
+# DeepSeek Harness 个人知识库
+
+> DeepSeek Harness (`dsh`) — DeepSeek AI 的开源 agent harness，「一切皆插件」，MIT License。
+> 官方仓库: https://github.com/deepseek-ai/deepseek-harness | 文档站: https://deepseek-harness.github.io/deepseek-harness/
+> 本文件是 LLM 入口索引（llmstxt 规范）。抓取方式见 README.md。
+
+## 官方文档精选（docs/，中文整理，附官方来源）
+
+- [项目概览](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/docs/overview.md): dsh 是什么、核心设计（一切皆插件）、许可证、引用信息
+- [快速开始](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/docs/quickstart.md): npm 安装、源码运行、Web UI 流程、安装插件
+- [dsh 命令行参考](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/docs/cli.md): 主命令、选项、web/headless/sdk/sdk-minimal/acp/plugin 各 profile、示例
+- [架构](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/docs/architecture.md): Cordis 框架、profile 与组合包、核心包、事件域、轮次流程、能力 seam、扩展归属速查表
+- [插件机制与开发](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/docs/plugins.md): Cordis 五概念、事件分发模式（emit/waterfall/parallel/serial/bail）、实践规则、插件安装分发
+- [配置体系](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/docs/configuration.md): DSH_HOME、profiles、cordis.patch.yml、patch 分层、凭据、环境变量
+- [模型提供商配置](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/docs/models.md): DeepSeek、第三方、自定义 API、图片输入、推理等级、compat 兼容、排错速查
+- [Python SDK](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/docs/sdk.md): 安装、minimal 示例、DeepSeekHarness 用法、插件、sdk-minimal 速查
+- [术语表](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/docs/glossary.md): seam、scope、目标、人类命令、turn/step/Round、Ralph
+
+## 个人项目（projects/，作者基于 dsh 构建）
+
+- [dsh-pet](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/projects/dsh-pet.md): 桌面宠物插件（npm 开源），动画/物理/桌面模式/余额/对话/pet pack
+- [dsh-phone](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/projects/dsh-phone.md): 手机经 Tailscale/局域网远程访问 dsh Web UI 的一键脚本
+- [qqbot](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/projects/qqbot.md): AstrBot + NapCat QQ 机器人 Docker 部署（Mac arm64）
+- [douyin-bot](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/projects/douyin-bot.md): Playwright 自动刷抖音 + DeepSeek 决策 + QQ 播报
+- [workspace-sync](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/projects/workspace-sync.md): 容器挂载健康确认服务
+- [zhipu-model-label](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/projects/zhipu-model-label.md): 智谱模型【免费/付费】标签 DSH 客户端插件
+
+## 个人笔记（notes/）
+
+- [环境速查](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/notes/setup.md): 版本、目录布局、安装方式、常用命令、备份习惯
+- [踩坑记录模板](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/notes/templates/issue-note.md)
+
+## 快速导航
+
+- 想了解 dsh 是什么 → docs/overview.md
+- 想安装启动 → docs/quickstart.md + docs/cli.md
+- 想理解架构 → docs/architecture.md
+- 想写插件 → docs/plugins.md
+- 想配置模型 → docs/models.md
+- 想用 Python 调用 → docs/sdk.md
+- 想参考真实项目 → projects/
