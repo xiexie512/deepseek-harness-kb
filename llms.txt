@@ -3,6 +3,7 @@
 > DeepSeek Harness (`dsh`) — DeepSeek AI 的开源 agent harness，「一切皆插件」，MIT License。
 > 官方仓库: https://github.com/deepseek-ai/deepseek-harness | 文档站: https://deepseek-harness.github.io/deepseek-harness/
 > 本文件是 LLM 入口索引（llmstxt 规范）。抓取方式见 README.md。
+> 若 raw.githubusercontent.com 不可达（如中国大陆网络），可把域名前缀替换为 https://cdn.jsdelivr.net/gh/xiexie512/deepseek-harness-kb@main/ 或使用配套脚本 scripts/kb.sh（三源自动回退）。
 
 ## 官方文档精选（docs/，中文整理，附官方来源）
 
