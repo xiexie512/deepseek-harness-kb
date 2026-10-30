@@ -50,7 +50,9 @@ curl -s https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/doc
 curl -s https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/llms-full.txt
 
 # 4. 用配套脚本（列出 / 按主题取 / 全文搜索；内置 raw → jsDelivr → GitHub API 三源自动回退）
-bash <(curl -s https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/scripts/kb.sh) list
+curl -fsSL https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/scripts/kb.sh -o /tmp/kb.sh \
+  || curl -fsSL https://cdn.jsdelivr.net/gh/xiexie512/deepseek-harness-kb@main/scripts/kb.sh -o /tmp/kb.sh
+bash /tmp/kb.sh list
 ```
 
 > **网络提示**：`raw.githubusercontent.com` 在部分地区（如中国大陆）不稳定。若直接抓取失败：
