@@ -3202,3 +3202,86 @@ python3 scripts/audit_design.py <文件或目录>
 # 生成 token 并看对比度自检
 python3 scripts/make_tokens.py --seed "#2563eb" --mode both --out tokens.css
 ```
+
+
+<!-- ====================== design/examples/README.md ====================== -->
+
+# 成品示例（examples/）
+
+6 个可以直接打开、直接复制的成品页面。每个文件都过了 `audit_design.py` 的 **100/100**，但它们真正的作用是给你一个"照着改"的起点，而不是收藏。
+
+| 文件 | 场景 | 主要演示的规则 |
+|---|---|---|
+| [landing.html](landing.html) | SaaS 落地页 | 一屏一个主张、真实截图代替插画、功能只做 3 个、数字带单位、CTA 收尾重复主按钮 |
+| [dashboard.html](dashboard.html) | 后台仪表盘 | 对齐优先、KPI 数字层级、状态用标签、表格数字右对齐 + `tabular-nums`、筛选回显 |
+| [components.html](components.html) | 组件陈列 | 按钮 3 档 × 5 语义、输入 4 态、开关/勾选、Tabs/面包屑/分页、骨架/空/错/成功、弹窗 |
+| [form.html](form.html) | 登录与表单 | 字段级错误写"差什么"、表单级错误定位到第一个、左侧列结果而非装饰墙、SSO 备选 |
+| [mobile.html](mobile.html) | 移动端 H5 | 44×44 热区、`env(safe-area-inset-*)`、底部主操作 + Tab、单屏一个主任务、列表两行截断 |
+| [charts.html](charts.html) | 数据图表页 | 标题写结论、只高亮一条其余转灰、直接标注代替图例框、柱从 0 起、表格去多余列 |
+| [reference.md](reference.md) | 参考清单 | 15 个成熟设计系统/产品，各自"借什么、别借什么" |
+
+## 怎么用（三步）
+
+1. **换 token**：每个文件顶部 `:root` 里只有一小撮变量，和 [../tokens.css](../tokens.css) 同名同值。把 `--brand-*` 换成你的品牌色即可；需要完整色阶时直接改成 `@import url("../tokens.css")`。
+2. **换内容**：所有文案都是真实结构的占位（工单、支付、发票这类具体名词），替换时保持**长度量级**——标题别从 8 字换成 30 字，版式会塌。
+3. **删段落**：不需要的 `section` 整段删掉，不要留空壳。落地页从 7 段砍到 4 段通常更好。
+
+## 已知局限
+
+- 示例只做视觉与状态，不含交互 JS：表单校验、弹窗开合、Tab 切换都是"画好的状态"，接逻辑时按 [../interaction.md](../interaction.md) 第 2 节的 9 种状态补齐。
+- 图表是手写 SVG，用来演示"去图例、直接标注"的画法；真实项目换成 ECharts 时，把 `grid` 收到 8、`splitLine` 改虚线、分类色压到 5 以内（配置片段见 [../surfaces.md](../surfaces.md) 第 7 节）。
+- 全部为静态 HTML + 内联 CSS，没有构建步骤，方便直接丢进任何项目里当起点。
+
+## 自检
+
+```sh
+python3 ../scripts/audit_design.py .        # 6 个文件应全为 100/100 A
+```
+
+审计只覆盖约 40% 的问题，剩下的（层次、留白、灰度测试、键盘走查）按 [../checklist.md](../checklist.md) 人工过。
+
+
+<!-- ====================== design/examples/reference.md ====================== -->
+
+# 参考方案清单
+
+抄要抄对地方：**抄结构与决策，不抄视觉皮肤**。下面每个都能直接打开看，都标了"借什么 / 别借什么"。
+
+## 一、设计系统（拿数值与组件规格）
+
+| 方案 | 链接 | 借什么 | 别借什么 |
+|---|---|---|---|
+| **Apple HIG** | developer.apple.com/design/human-interface-guidelines | 触控尺寸（44pt）、安全区、层级由"内容-控件-导航"三层决定、系统态文案 | 大量毛玻璃与动效，Web 上性能代价高 |
+| **Material 3** | m3.material.io | 动效时长（500/400/300/200ms）、状态层级、token 化的色彩角色 | 强品牌色大面积铺（Web 后台会显得吵） |
+| **Ant Design** | ant.design | 后台组件规格（表格 48 行高、表单 3 列栅格）、中文字号（14 正文） | 默认蓝 + 大量边框，容易"一眼 Ant" |
+| **Arco Design** | arco.design | 中后台密度档位、暗色主题映射 | 组件阴影偏重 |
+| **shadcn/ui** | ui.shadcn.com | 中性色阶做法、组件无重阴影、`radius` 单变量控制全站 | 直接搬配色（偏灰，品牌感弱） |
+| **Radix Primitives** | radix-ui.com | 无障碍行为（焦点管理、Esc、aria 属性） | 视觉层几乎为零，需自己补 |
+| **IBM Carbon** | carbondesignsystem.com | 数据密集型界面的排版与表格规范、10px 间距体系 | 字重偏细，中文会显虚 |
+| **GitHub Primer** | primer.style | 代码/文档场景的排版、行内代码与表格样式 | 高密度配色，营销页不合适 |
+| **Tailwind UI** | tailwindui.com | 落地页区块顺序、留白节奏 | 直接照抄会出现"千篇一律的紫色渐变" |
+
+## 二、产品（拿"感觉"与具体做法）
+
+| 产品 | 借什么 | 别借什么 |
+|---|---|---|
+| **Linear** | 极窄边线 + 极浅灰阶 + 单一强调色；列表行高 40；信息密度高但不挤 | 深色为主，浅色版要自己调 |
+| **Vercel / Geist** | 大字标题 + 紧字距（-0.02em）；黑底白字对比结构 | 纯黑大块面积，长文阅读疲劳 |
+| **Stripe** | 表单错误文案的具体程度；文档页的三栏结构 | 大量动效与插图 |
+| **Notion** | 文档排版的层级（标题-正文-引用-代码块）不用颜色也能分层 | 侧栏交互复杂度 |
+| **Figma** | 组件状态矩阵的画法（用于评审，不用于产品界面） | 密集工具栏 |
+| **Airbnb** | 卡片圆角 12 + 单层阴影 + 图片占比；移动端底部固定主操作 | 大图依赖，无图场景失效 |
+
+## 三、方法论（拿判断标准）
+
+- **Nielsen 十原则**（nngroup.com）——评审时逐条打勾，见 [../interaction.md](../interaction.md) 第 1 节。
+- **WCAG 2.2 快速参考**（www.w3.org/WAI/WCAG22/quickref/）——AA 的硬门槛，见 [../interaction.md](../interaction.md) 第 9 节。
+- **Refactoring UI**（refactoringui.com）——"约束刻度"的原始出处：间距、字阶、灰度都先定刻度再取值。
+- **Laws of UX**（lawsofux.com）——解释"为什么这样感觉更好"，适合在评审里说服人。
+
+## 四、怎么用这张清单
+
+1. **先定血缘**：一个项目只选 1 个设计系统做骨架（后台选 Ant/Arco，营销页选 Tailwind UI 的区块顺序），不要混三套。
+2. **只借三层**：间距刻度、字号字阶、组件尺寸。配色与圆角统一按 [../foundations.md](../foundations.md) 自己定。
+3. **对照检查**：拿目标产品的截图和自己的并排放大到 20%，看层次是否一致；不一致时先调层级，别急着换颜色。
+4. **别抄皮肤**：抄"卡片圆角 12 + 阴影两级"，不要抄"某个具体渐变"。皮肤会过时，结构不会。

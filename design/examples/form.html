@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>表单与登录参考 · 设计质量系统</title>
+<style>
+  :root{
+    --brand-50:#f5f7fb; --brand-100:#e8edf7; --brand-500:#2563eb; --brand-600:#144cc6; --brand-700:#1b4295;
+    --n-50:#fafafb; --n-100:#f4f5f6; --n-200:#e7e8eb; --n-300:#d0d2d8; --n-500:#828897;
+    --n-600:#616775; --n-700:#464a53; --n-900:#1a1b1e;
+    --ok:#15803d; --ok-bg:#f0fdf4; --err:#b91c1c; --err-bg:#fef2f2;
+    --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s6:24px; --s8:32px; --s12:48px; --s16:64px;
+    --t-xs:12px; --t-sm:14px; --t-base:16px; --t-lg:18px; --t-xl:20px; --t-2xl:24px; --t-3xl:30px;
+    --r-sm:4px; --r-md:8px; --r-lg:12px; --r-full:999px;
+    --sh1:0 1px 2px rgb(15 23 42/.06),0 1px 1px rgb(15 23 42/.04);
+    --ease:cubic-bezier(.2,0,0,1); --dur:200ms;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;background:var(--n-50);color:var(--n-900);
+    font:400 16px/1.65 -apple-system,BlinkMacSystemFont,"PingFang SC","Segoe UI","Noto Sans SC",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .split{display:grid;grid-template-columns:minmax(0,1fr) 520px;min-height:100vh}
+  :focus-visible{outline:2px solid var(--brand-500);outline-offset:2px}
+
+  /* 左侧品牌说明：只放一句主张和三条结果，不做装饰墙 */
+  .brandside{background:#fff;border-right:1px solid var(--n-200);padding:var(--s16) var(--s12);display:flex;flex-direction:column;justify-content:center;gap:var(--s6)}
+  .logo{display:flex;align-items:center;gap:var(--s2);font-weight:600}
+  .logo i{width:24px;height:24px;border-radius:var(--r-sm);background:var(--brand-600);display:block}
+  h1{margin:0;font-size:var(--t-3xl);line-height:1.25;letter-spacing:-.02em;max-width:22ch}
+  .lede{margin:0;max-width:38ch;color:var(--n-600);font-size:var(--t-base);line-height:1.65}
+  .points{display:grid;gap:var(--s3);margin:0;padding:0;list-style:none}
+  .points li{display:flex;gap:var(--s3);align-items:flex-start;font-size:var(--t-sm);color:var(--n-600)}
+  .points li b{color:var(--n-900);font-weight:500}
+  .tick{width:20px;height:20px;border-radius:var(--r-full);background:var(--brand-50);color:var(--brand-600);
+    display:grid;place-items:center;font-size:var(--t-xs);flex:none}
+
+  /* 右侧表单 */
+  .formside{display:flex;align-items:center;justify-content:center;padding:var(--s12) var(--s6)}
+  .card{width:380px;display:grid;gap:var(--s6)}
+  .card h2{margin:0;font-size:var(--t-2xl);line-height:1.25;font-weight:600}
+  .card .sub{margin:var(--s1) 0 0;font-size:var(--t-sm);color:var(--n-500)}
+
+  form{display:grid;gap:var(--s4)}
+  .field{display:grid;gap:var(--s2)}
+  .label{font-size:var(--t-sm);font-weight:500;color:var(--n-700);display:flex;justify-content:space-between;align-items:center}
+  .label a{font-size:var(--t-xs);color:var(--brand-600);text-decoration:none;font-weight:400}
+  .input{width:100%;height:44px;padding:0 var(--s3);border:1px solid var(--n-300);border-radius:var(--r-md);
+    background:#fff;color:var(--n-900);font:inherit;font-size:var(--t-sm);
+    transition:border-color var(--dur) var(--ease),box-shadow var(--dur) var(--ease)}
+  .input::placeholder{color:var(--n-500)}
+  .input:focus{outline:none;border-color:var(--brand-500);box-shadow:0 0 0 3px var(--brand-100)}
+  .is-error{border-color:var(--err);background:var(--err-bg)}
+  .is-error:focus{box-shadow:0 0 0 3px #fee2e2}
+  .hint{font-size:var(--t-xs);color:var(--n-500)}
+  .errmsg{display:flex;gap:var(--s1);align-items:center;font-size:var(--t-xs);color:var(--err)}
+  .errmsg::before{content:"!";width:14px;height:14px;border-radius:var(--r-full);border:1px solid var(--err);
+    display:grid;place-items:center;font-size:var(--t-xs);flex:none;line-height:1}
+
+  .alert{display:grid;gap:var(--s1);padding:var(--s3) var(--s4);border-radius:var(--r-md);
+    background:var(--err-bg);border:1px solid #fecaca;font-size:var(--t-sm)}
+  .alert b{color:var(--err);font-weight:600}
+  .alert span{color:var(--n-700)}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;height:48px;width:100%;
+    border:1px solid transparent;border-radius:var(--r-md);font-size:var(--t-base);font-weight:500;cursor:pointer;
+    transition:background var(--dur) var(--ease),transform var(--dur) var(--ease)}
+  .btn:active{transform:scale(.99)}
+  .btn-primary{background:var(--brand-600);color:#fff}
+  .btn-primary:hover{background:var(--brand-700)}
+  .btn-secondary{background:#fff;color:var(--n-700);border-color:var(--n-300)}
+  .btn-secondary:hover{background:var(--n-100)}
+
+  .note{font-size:var(--t-xs);color:var(--n-500);line-height:1.5}
+  .note a{color:var(--brand-600)}
+  .divider{display:flex;align-items:center;gap:var(--s3);font-size:var(--t-xs);color:var(--n-500)}
+  .divider::before,.divider::after{content:"";height:1px;background:var(--n-200);flex:1}
+
+  @media (max-width:900px){
+    .split{grid-template-columns:1fr}
+    .brandside{padding:var(--s8) var(--s6);border-right:0;border-bottom:1px solid var(--n-200)}
+    .formside{padding:var(--s8) var(--s6)}
+    .card{width:100%;max-width:420px}
+  }
+  @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div class="split">
+
+  <aside class="brandside">
+    <div class="logo"><i aria-hidden="true"></i>Northwind</div>
+    <h1>把工单处理时间砍掉一半</h1>
+    <p class="lede">自动归类、批量回复、超时预警。已有 1,284 个团队在用。</p>
+    <ul class="points">
+      <li><span class="tick" aria-hidden="true">✓</span><span><b>免费试用 14 天</b>，不需要信用卡</span></li>
+      <li><span class="tick" aria-hidden="true">✓</span><span><b>数据随时导出</b>，CSV 与 API 都支持</span></li>
+      <li><span class="tick" aria-hidden="true">✓</span><span><b>5 分钟接入</b>，不改现有工作流</span></li>
+    </ul>
+  </aside>
+
+  <div class="formside">
+    <div class="card">
+      <div>
+        <h2>登录你的工作台</h2>
+        <p class="sub">用公司邮箱，或继续用下面的方式</p>
+      </div>
+
+      <!-- 表单级错误：说清数量并定位 -->
+      <div class="alert" role="alert">
+        <b>有 1 个字段需要修改</b>
+        <span>已定位到第一个错误字段，修改后可再次提交。</span>
+      </div>
+
+      <form novalidate>
+        <div class="field">
+          <label class="label" for="email">邮箱</label>
+          <input class="input is-error" id="email" type="email" value="lin@" autocomplete="username"
+                 aria-invalid="true" aria-describedby="email-err" />
+          <span class="errmsg" id="email-err">邮箱需要包含域名，例如 name@example.com</span>
+        </div>
+
+        <div class="field">
+          <div class="label"><label for="pwd">密码</label><a href="#reset">忘记密码</a></div>
+          <input class="input" id="pwd" type="password" placeholder="至少 8 位" autocomplete="current-password" />
+          <span class="hint">区分大小写，支持粘贴</span>
+        </div>
+
+        <button class="btn btn-primary" type="submit">登录</button>
+      </form>
+
+      <div class="divider">或</div>
+      <button class="btn btn-secondary" type="button">使用 SSO 登录</button>
+
+      <p class="note">还没有账号？<a href="#signup">创建团队</a>。登录即表示同意<a href="#terms">服务条款</a>与<a href="#privacy">隐私政策</a>。</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>

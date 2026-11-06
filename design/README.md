@@ -30,6 +30,7 @@
 | 交付前最后一遍 | [checklist.md](checklist.md) |
 | 想直接用 token | [tokens.css](tokens.css) 或 `scripts/make_tokens.py` |
 | 想机器打分 | `scripts/audit_design.py` |
+| 想抄现成的 | [examples/](examples/) 6 个成品页 + [reference.md](examples/reference.md) 参考清单 |
 
 ## 文件清单
 
@@ -45,6 +46,22 @@
 | [tokens.css](tokens.css) | 亮/暗双主题 token，可直接 `@import` |
 | `scripts/make_tokens.py` | 按种子色生成整套 token，自带对比度自检 |
 | `scripts/audit_design.py` | 审查 HTML/CSS，出 0–100 分与硬伤清单 |
+| [examples/](examples/) | 6 个成品示例（落地页/后台/组件/表单/H5/图表），每个 100/100，可直接复制改 |
+
+## 成品示例
+
+规则读完了不知道长什么样，就先看这几页——都是完整可跑的单文件 HTML，各自 100/100：
+
+| 示例 | 抄什么 |
+|---|---|
+| [landing.html](examples/landing.html) | 一屏一个主张、真实截图代替插画、功能只做 3 个 |
+| [dashboard.html](examples/dashboard.html) | 对齐优先、KPI 层级、状态标签、数字右对齐 |
+| [components.html](examples/components.html) | 按钮 3 档 × 5 语义、输入 4 态、骨架/空/错/成功 |
+| [form.html](examples/form.html) | 字段级错误写"差什么"、表单级错误定位到第一个 |
+| [mobile.html](examples/mobile.html) | 44×44 热区、安全区、底部主操作 + Tab |
+| [charts.html](examples/charts.html) | 标题写结论、一条高亮其余转灰、直接标注代替图例 |
+
+另外 [examples/reference.md](examples/reference.md) 列了 15 个成熟方案（Apple HIG / Material 3 / Ant / shadcn / Linear / Stripe …），每条标了"借什么、别借什么"。
 
 ## 两种用法
 

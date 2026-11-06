@@ -37,6 +37,8 @@
 - [场景配方](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/design/surfaces.md): 网页/App/仪表盘/PPT/报告/海报/图表/Markdown README 的结构与数值
 - [交付前清单](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/design/checklist.md): 按产出类型的逐条勾选清单
 - [设计 token](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/design/tokens.css): 亮/暗双主题 CSS 变量，可直接 @import
+- [成品示例索引](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/design/examples/README.md): 6 个可直接复制的完整页面（落地页/后台/组件/表单/H5/图表），每个审计 100/100
+- [参考方案清单](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/design/examples/reference.md): Apple HIG / Material 3 / Ant / shadcn / Linear / Stripe 等 15 个方案，各标「借什么、别借什么」
 
 ## 个人笔记（notes/）
 

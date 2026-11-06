@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>落地页参考 · 设计质量系统</title>
+<style>
+  /* 只取 tokens.css 里用到的子集，方便单文件打开 */
+  :root{
+    --brand-50:#f5f7fb; --brand-100:#e8edf7; --brand-500:#2563eb; --brand-600:#144cc6; --brand-700:#1b4295;
+    --neutral-50:#fafafb; --neutral-100:#f4f5f6; --neutral-200:#e7e8eb; --neutral-300:#d0d2d8;
+    --neutral-500:#828897; --neutral-600:#616775; --neutral-700:#464a53; --neutral-900:#1a1b1e;
+    --shadow-color:15 23 42;
+    --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s6:24px; --s8:32px; --s12:48px; --s16:64px; --s24:96px;
+    --t-xs:12px; --t-sm:14px; --t-base:16px; --t-lg:18px; --t-xl:20px; --t-2xl:24px; --t-3xl:30px; --t-5xl:48px;
+    --r-sm:4px; --r-md:8px; --r-lg:12px; --r-full:999px;
+    --sh1:0 1px 2px rgb(var(--shadow-color)/.06),0 1px 1px rgb(var(--shadow-color)/.04);
+    --sh2:0 4px 8px -2px rgb(var(--shadow-color)/.08),0 2px 4px -2px rgb(var(--shadow-color)/.06);
+    --ease:cubic-bezier(.2,0,0,1);
+    --dur:200ms;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  body{
+    margin:0;background:#fff;color:var(--neutral-900);
+    font:400 16px/1.65 -apple-system,BlinkMacSystemFont,"PingFang SC","Segoe UI","Noto Sans SC",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--brand-600);text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 var(--s6)}
+
+  /* ---------- 导航 ---------- */
+  header{
+    position:sticky;top:0;z-index:10;height:64px;
+    background:rgba(255,255,255,.85);backdrop-filter:saturate(180%) blur(12px);
+    border-bottom:1px solid var(--neutral-200);
+  }
+  header .wrap{display:flex;align-items:center;justify-content:space-between;height:100%}
+  .logo{display:flex;align-items:center;gap:var(--s2);font-weight:600;letter-spacing:-.02em;color:var(--neutral-900)}
+  .logo i{width:24px;height:24px;border-radius:var(--r-sm);background:var(--brand-600);display:block}
+  nav{display:flex;gap:var(--s6);font-size:var(--t-sm)}
+  nav a{color:var(--neutral-600)}
+  nav a:hover{color:var(--neutral-900)}
+  .nav-cta{display:flex;gap:var(--s3);align-items:center}
+
+  /* ---------- 按钮 ---------- */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);
+    height:44px;padding:0 var(--s6);border-radius:var(--r-md);border:1px solid transparent;
+    font-size:var(--t-base);font-weight:500;cursor:pointer;
+    transition:background var(--dur) var(--ease),border-color var(--dur) var(--ease),transform var(--dur) var(--ease)}
+  .btn:active{transform:scale(.98)}
+  .btn-primary{background:var(--brand-600);color:#fff}
+  .btn-primary:hover{background:var(--brand-700)}
+  .btn-ghost{background:transparent;color:var(--neutral-700);border-color:var(--neutral-300)}
+  .btn-ghost:hover{background:var(--neutral-100)}
+  .btn-sm{height:36px;padding:0 var(--s4);font-size:var(--t-sm)}
+  :focus-visible{outline:2px solid var(--brand-500);outline-offset:2px}
+
+  /* ---------- Hero ---------- */
+  .hero{padding:var(--s24) 0 var(--s16)}
+  .hero .wrap{display:grid;grid-template-columns:minmax(0,1fr) 480px;gap:var(--s12);align-items:center}
+  .eyebrow{display:inline-flex;align-items:center;gap:var(--s2);font-size:var(--t-xs);font-weight:500;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--brand-700);
+    background:var(--brand-50);border:1px solid var(--brand-100);padding:var(--s1) var(--s3);border-radius:var(--r-full)}
+  h1{margin:var(--s6) 0 var(--s4);font-size:var(--t-5xl);line-height:1.1;letter-spacing:-.02em;font-weight:700}
+  .lede{margin:0;max-width:34ch;font-size:var(--t-lg);line-height:1.65;color:var(--neutral-600)}
+  .actions{display:flex;gap:var(--s3);margin-top:var(--s8);flex-wrap:wrap}
+  .note{margin-top:var(--s3);font-size:var(--t-sm);color:var(--neutral-500)}
+
+  /* 产品截图：真实界面比插画可信 */
+  .shot{border:1px solid var(--neutral-200);border-radius:var(--r-lg);box-shadow:var(--sh2);overflow:hidden;background:#fff}
+  .shot-bar{display:flex;align-items:center;gap:var(--s1);padding:var(--s3) var(--s4);border-bottom:1px solid var(--neutral-200);background:var(--neutral-50)}
+  .dot{width:8px;height:8px;border-radius:var(--r-full);background:var(--neutral-300)}
+  .shot-body{padding:var(--s4);font-size:var(--t-sm);color:var(--neutral-600)}
+  .row{display:flex;align-items:center;justify-content:space-between;padding:var(--s3) 0;border-bottom:1px solid var(--neutral-100)}
+  .row b{color:var(--neutral-900);font-weight:500}
+  .pill{font-size:var(--t-xs);padding:var(--s1) var(--s2);border-radius:var(--r-sm);background:var(--brand-50);color:var(--brand-700)}
+
+  /* ---------- 数据条 ---------- */
+  .stats{border-block:1px solid var(--neutral-200);background:var(--neutral-50)}
+  .stats .wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s6);padding:var(--s8) var(--s6)}
+  .stat b{display:block;font-size:var(--t-3xl);font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .stat span{font-size:var(--t-sm);color:var(--neutral-600)}
+
+  /* ---------- 功能 ---------- */
+  .section{padding:var(--s16) 0}
+  .section h2{margin:0 0 var(--s3);font-size:var(--t-3xl);line-height:1.25;letter-spacing:-.02em}
+  .section p.sub{margin:0 0 var(--s12);max-width:48ch;color:var(--neutral-600)}
+  .feats{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s6)}
+  .feat{background:#fff;border:1px solid var(--neutral-200);border-radius:var(--r-lg);padding:var(--s6);
+    transition:box-shadow var(--dur) var(--ease),transform var(--dur) var(--ease)}
+  .feat:hover{box-shadow:var(--sh2);transform:translateY(-2px)}
+  .ico{width:32px;height:32px;border-radius:var(--r-md);background:var(--brand-50);border:1px solid var(--brand-100);
+    display:flex;align-items:center;justify-content:center;color:var(--brand-700);font-weight:600;font-size:var(--t-sm)}
+  .feat h3{margin:var(--s4) 0 var(--s2);font-size:var(--t-lg);font-weight:600}
+  .feat p{margin:0;font-size:var(--t-sm);line-height:1.65;color:var(--neutral-600)}
+
+  /* ---------- 引述 ---------- */
+  .quote{background:var(--neutral-50);border-block:1px solid var(--neutral-200)}
+  .quote .wrap{padding:var(--s16) var(--s6);display:grid;grid-template-columns:3fr 2fr;gap:var(--s12);align-items:center}
+  blockquote{margin:0;font-size:var(--t-2xl);line-height:1.5;letter-spacing:-.01em}
+  .qmeta{margin-top:var(--s6);font-size:var(--t-sm);color:var(--neutral-600)}
+
+  /* ---------- CTA ---------- */
+  .cta{padding:var(--s16) 0}
+  .cta-box{background:var(--brand-600);border-radius:var(--r-lg);padding:var(--s12) var(--s12);
+    display:flex;align-items:center;justify-content:space-between;gap:var(--s8);flex-wrap:wrap}
+  .cta-box h2{margin:0;color:#fff;font-size:var(--t-3xl);line-height:1.25}
+  .cta-box p{margin:var(--s2) 0 0;color:rgba(255,255,255,.85);font-size:var(--t-sm)}
+  .btn-light{background:#fff;color:var(--brand-700)}
+
+  /* ---------- 页脚 ---------- */
+  footer{border-top:1px solid var(--neutral-200);padding:var(--s12) 0;font-size:var(--t-sm);color:var(--neutral-500)}
+  footer .wrap{display:flex;justify-content:space-between;gap:var(--s8);flex-wrap:wrap}
+
+  @media (max-width:900px){
+    .hero .wrap{grid-template-columns:1fr;gap:var(--s8)}
+    .hero{padding:var(--s16) 0 var(--s12)}
+    h1{font-size:var(--t-3xl)}
+    .stats .wrap{grid-template-columns:repeat(2,1fr)}
+    .feats{grid-template-columns:1fr}
+    .quote .wrap{grid-template-columns:1fr;gap:var(--s6);padding:var(--s12) var(--s6)}
+    nav{display:none}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="logo"><i aria-hidden="true"></i>Northwind</div>
+    <nav aria-label="主导航">
+      <a href="#feat">功能</a><a href="#price">价格</a><a href="#docs">文档</a><a href="#blog">博客</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn btn-ghost btn-sm" href="#login">登录</a>
+      <a class="btn btn-primary btn-sm" href="#start">免费开始</a>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <span class="eyebrow">新版本 · 支持导出</span>
+      <h1>把工单处理时间<br>砍掉一半</h1>
+      <p class="lede">自动归类、批量回复、超时预警。团队不用再翻三个系统找一条记录。</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="#start">免费试用 14 天</a>
+        <a class="btn btn-ghost" href="#demo">看 2 分钟演示</a>
+      </div>
+      <p class="note">无需信用卡 · 随时导出数据</p>
+    </div>
+    <div class="shot" role="img" aria-label="产品界面截图：工单列表与处理状态">
+      <div class="shot-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+      <div class="shot-body">
+        <div class="row"><b>#1042 支付回调超时</b><span class="pill">待处理</span></div>
+        <div class="row"><b>#1041 账号无法登录</b><span class="pill">处理中</span></div>
+        <div class="row"><b>#1040 发票抬头修改</b><span class="pill">已完成</span></div>
+        <div class="row" style="border-bottom:0"><b>#1039 批量导出失败</b><span class="pill">已升级</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stats" aria-label="关键数据">
+  <div class="wrap">
+    <div class="stat"><b>1,284</b><span>接入团队</span></div>
+    <div class="stat"><b>52%</b><span>平均处理时长下降</span></div>
+    <div class="stat"><b>3.2 分钟</b><span>首次响应中位数</span></div>
+    <div class="stat"><b>99.95%</b><span>过去 12 个月可用率</span></div>
+  </div>
+</section>
+
+<section class="section" id="feat">
+  <div class="wrap">
+    <h2>三件事，做完就够了</h2>
+    <p class="sub">不是功能清单，是三个具体动作：自动分派、批量回复、超时预警。</p>
+    <div class="feats">
+      <article class="feat">
+        <div class="ico" aria-hidden="true">1</div>
+        <h3>自动分派到正确的人</h3>
+        <p>按标签、语言、负载分配，不用值班表手工调。</p>
+      </article>
+      <article class="feat">
+        <div class="ico" aria-hidden="true">2</div>
+        <h3>一次回复十条工单</h3>
+        <p>同一类问题合并处理，回复模板带变量自动填充。</p>
+      </article>
+      <article class="feat">
+        <div class="ico" aria-hidden="true">3</div>
+        <h3>超时前 30 分钟提醒</h3>
+        <p>按 SLA 倒计时，升级规则自动触发，不用人盯。</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="quote">
+  <div class="wrap">
+    <blockquote>“上线第一周，值班人从 6 个减到 3 个，夜里没有人再被电话叫醒。”</blockquote>
+    <div>
+      <div class="qmeta">林澈 · 客服负责人</div>
+      <div class="qmeta" style="color:var(--neutral-500)">某电商平台，日均 2,000 工单</div>
+    </div>
+  </div>
+</section>
+
+<section class="cta" id="start">
+  <div class="wrap">
+    <div class="cta-box">
+      <div>
+        <h2>今天下午就能跑起来</h2>
+        <p>导入现有工单，不改你的工作流。</p>
+      </div>
+      <a class="btn btn-light" href="#signup">创建账号</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Northwind · 示例页面</span>
+    <span><a href="#terms">条款</a> · <a href="#privacy">隐私</a> · <a href="#status">状态</a></span>
+  </div>
+</footer>
+
+</body>
+</html>

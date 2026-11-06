@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>后台仪表盘参考 · 设计质量系统</title>
+<style>
+  :root{
+    --brand-50:#f5f7fb; --brand-100:#e8edf7; --brand-500:#2563eb; --brand-600:#144cc6;
+    --n-50:#fafafb; --n-100:#f4f5f6; --n-200:#e7e8eb; --n-300:#d0d2d8; --n-500:#828897;
+    --n-600:#616775; --n-700:#464a53; --n-900:#1a1b1e;
+    --ok:#15803d; --ok-bg:#f0fdf4; --warn:#b45309; --warn-bg:#fffbeb;
+    --err:#b91c1c; --err-bg:#fef2f2; --info:#1d4ed8; --info-bg:#eff6ff;
+    --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s6:24px; --s8:32px; --s12:48px;
+    --t-xs:12px; --t-sm:14px; --t-base:16px; --t-xl:20px; --t-2xl:24px; --t-3xl:30px;
+    --r-sm:4px; --r-md:8px; --r-lg:12px; --r-full:999px;
+    --sh1:0 1px 2px rgb(15 23 42/.06),0 1px 1px rgb(15 23 42/.04);
+    --ease:cubic-bezier(.2,0,0,1); --dur:200ms;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;background:var(--n-50);color:var(--n-900);
+    font:400 14px/1.5 -apple-system,BlinkMacSystemFont,"PingFang SC","Segoe UI","Noto Sans SC",sans-serif;
+    font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+
+  .shell{display:grid;grid-template-columns:224px minmax(0,1fr);min-height:100vh}
+
+  /* ---------- 侧栏 ---------- */
+  .side{background:#fff;border-right:1px solid var(--n-200);padding:var(--s6) var(--s3);display:flex;flex-direction:column;gap:var(--s6)}
+  .brand{display:flex;align-items:center;gap:var(--s2);padding:0 var(--s3);font-weight:600;letter-spacing:-.01em}
+  .brand i{width:20px;height:20px;border-radius:var(--r-sm);background:var(--brand-600);display:block}
+  .side nav{display:flex;flex-direction:column;gap:var(--s1)}
+  .side .group{font-size:var(--t-xs);color:var(--n-500);padding:var(--s2) var(--s3);letter-spacing:.06em}
+  .item{display:flex;align-items:center;gap:var(--s2);height:36px;padding:0 var(--s3);border-radius:var(--r-md);
+    color:var(--n-600);font-size:var(--t-sm);text-decoration:none;transition:background var(--dur) var(--ease)}
+  .item:hover{background:var(--n-100);color:var(--n-900)}
+  .item[aria-current]{background:var(--brand-50);color:var(--brand-600);font-weight:500}
+  .item .badge{margin-left:auto;font-size:var(--t-xs);color:var(--n-500)}
+  .side .foot{margin-top:auto;padding:var(--s3);border-top:1px solid var(--n-100);font-size:var(--t-xs);color:var(--n-500)}
+
+  /* ---------- 顶栏 ---------- */
+  .top{position:sticky;top:0;z-index:10;height:56px;background:rgba(255,255,255,.9);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--n-200);display:flex;align-items:center;justify-content:space-between;padding:0 var(--s6)}
+  .crumb{display:flex;align-items:center;gap:var(--s2);font-size:var(--t-sm);color:var(--n-500)}
+  .crumb b{color:var(--n-900);font-weight:500}
+  .top .right{display:flex;align-items:center;gap:var(--s3)}
+  .search{display:flex;align-items:center;gap:var(--s2);height:36px;padding:0 var(--s3);width:240px;
+    border:1px solid var(--n-200);border-radius:var(--r-md);background:#fff;color:var(--n-500);font-size:var(--t-sm)}
+  .avatar{width:32px;height:32px;border-radius:var(--r-full);background:var(--brand-100);color:var(--brand-600);
+    display:flex;align-items:center;justify-content:center;font-size:var(--t-sm);font-weight:600}
+
+  /* ---------- 主体 ---------- */
+  main{padding:var(--s6) var(--s6) var(--s12);max-width:1120px}
+  .head{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--s6);margin-bottom:var(--s6)}
+  h1{margin:0;font-size:var(--t-2xl);line-height:1.25;letter-spacing:-.02em;font-weight:600}
+  .sub{margin:var(--s1) 0 0;font-size:var(--t-sm);color:var(--n-500)}
+  .actions{display:flex;gap:var(--s2)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 var(--s4);
+    border-radius:var(--r-md);border:1px solid var(--n-200);background:#fff;color:var(--n-700);
+    font-size:var(--t-sm);font-weight:500;cursor:pointer;transition:background var(--dur) var(--ease)}
+  .btn:hover{background:var(--n-100)}
+  .btn-primary{background:var(--brand-600);color:#fff;border-color:var(--brand-600)}
+  .btn-primary:hover{background:#1b4295}
+  :focus-visible{outline:2px solid var(--brand-500);outline-offset:2px}
+
+  /* KPI：数字最大、单位最小、对比次之 */
+  .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--s4);margin-bottom:var(--s6)}
+  .kpi{background:#fff;border:1px solid var(--n-200);border-radius:var(--r-lg);padding:var(--s4)}
+  .kpi .label{font-size:var(--t-xs);color:var(--n-500)}
+  .kpi .val{margin-top:var(--s2);font-size:var(--t-3xl);font-weight:600;letter-spacing:-.02em;line-height:1.1}
+  .kpi .val small{font-size:var(--t-sm);font-weight:400;color:var(--n-500);margin-left:var(--s1)}
+  .kpi .delta{margin-top:var(--s2);font-size:var(--t-xs)}
+  .up{color:var(--ok)} .down{color:var(--err)}
+
+  /* 表格 */
+  .panel{background:#fff;border:1px solid var(--n-200);border-radius:var(--r-lg);overflow:hidden}
+  .panel-head{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);
+    padding:var(--s4) var(--s6);border-bottom:1px solid var(--n-100);flex-wrap:wrap}
+  .panel-head h2{margin:0;font-size:var(--t-base);font-weight:600}
+  .filters{display:flex;align-items:center;gap:var(--s2);font-size:var(--t-sm)}
+  .sel{height:32px;padding:0 var(--s3);border:1px solid var(--n-200);border-radius:var(--r-md);
+    background:#fff;color:var(--n-700);font-size:var(--t-sm)}
+  .chips{display:flex;gap:var(--s2);align-items:center}
+  .chip{display:inline-flex;align-items:center;gap:var(--s1);height:24px;padding:0 var(--s2);
+    border-radius:var(--r-sm);background:var(--brand-50);color:var(--brand-600);font-size:var(--t-xs)}
+
+  table{width:100%;border-collapse:collapse;font-size:var(--t-sm)}
+  thead th{text-align:left;font-size:var(--t-xs);font-weight:500;color:var(--n-500);
+    padding:var(--s3) var(--s4);border-bottom:1px solid var(--n-100);white-space:nowrap}
+  tbody td{padding:var(--s3) var(--s4);border-bottom:1px solid var(--n-100);color:var(--n-700);white-space:nowrap}
+  tbody tr:hover{background:var(--n-50)}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  th.num{text-align:right}
+  .id{color:var(--n-500);font-size:var(--t-xs)}
+  .tag{display:inline-flex;align-items:center;height:24px;padding:0 var(--s2);border-radius:var(--r-sm);font-size:var(--t-xs);font-weight:500}
+  .t-ok{background:var(--ok-bg);color:var(--ok)}
+  .t-warn{background:var(--warn-bg);color:var(--warn)}
+  .t-err{background:var(--err-bg);color:var(--err)}
+  .t-info{background:var(--info-bg);color:var(--info)}
+  .panel-foot{display:flex;align-items:center;justify-content:space-between;padding:var(--s3) var(--s6);font-size:var(--t-xs);color:var(--n-500)}
+  .pager{display:flex;gap:var(--s1)}
+  .pg{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid var(--n-200);
+    border-radius:var(--r-md);background:#fff;color:var(--n-700);font-size:var(--t-sm);cursor:pointer}
+  .pg[aria-current]{background:var(--brand-50);border-color:var(--brand-100);color:var(--brand-600)}
+
+  @media (max-width:900px){
+    .shell{grid-template-columns:1fr}
+    .side{display:none}
+    .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .search{display:none}
+    main{padding:var(--s4)}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <aside class="side">
+    <div class="brand"><i aria-hidden="true"></i>Northwind</div>
+    <nav aria-label="主导航">
+      <span class="group">工作</span>
+      <a class="item" href="#" aria-current="page">工单<span class="badge">12</span></a>
+      <a class="item" href="#">客户</a>
+      <a class="item" href="#">知识库</a>
+      <span class="group">分析</span>
+      <a class="item" href="#">报表</a>
+      <a class="item" href="#">SLA 监控</a>
+      <span class="group">设置</span>
+      <a class="item" href="#">成员</a>
+      <a class="item" href="#">集成</a>
+    </nav>
+    <div class="foot">免费版 · 剩余 3 个席位</div>
+  </aside>
+
+  <div>
+    <div class="top">
+      <div class="crumb">工单 <span aria-hidden="true">/</span> <b>总览</b></div>
+      <div class="right">
+        <div class="search" role="search"><span aria-hidden="true">⌕</span>搜索工单编号或客户</div>
+        <div class="avatar" aria-label="当前用户：林">林</div>
+      </div>
+    </div>
+
+    <main>
+      <div class="head">
+        <div>
+          <h1>工单总览</h1>
+          <p class="sub">10 月 30 日 – 11 月 5 日 · 共 2,048 条</p>
+        </div>
+        <div class="actions">
+          <button class="btn" type="button">导出</button>
+          <button class="btn btn-primary" type="button">新建工单</button>
+        </div>
+      </div>
+
+      <section class="kpis" aria-label="关键指标">
+        <div class="kpi">
+          <div class="label">待处理</div>
+          <div class="val">128<small>条</small></div>
+          <div class="delta down">较上周 +12%</div>
+        </div>
+        <div class="kpi">
+          <div class="label">首次响应中位数</div>
+          <div class="val">3.2<small>分钟</small></div>
+          <div class="delta up">较上周 −18%</div>
+        </div>
+        <div class="kpi">
+          <div class="label">解决率</div>
+          <div class="val">92.4<small>%</small></div>
+          <div class="delta up">较上周 +2.1pt</div>
+        </div>
+        <div class="kpi">
+          <div class="label">SLA 超时</div>
+          <div class="val">7<small>条</small></div>
+          <div class="delta down">需今日处理</div>
+        </div>
+      </section>
+
+      <section class="panel" aria-label="工单列表">
+        <div class="panel-head">
+          <h2>全部工单</h2>
+          <div class="filters">
+            <div class="chips">
+              <span class="chip">状态：未完成 <button type="button" class="chip" aria-label="移除状态筛选" style="border:0;background:transparent;color:inherit;cursor:pointer">×</button></span>
+            </div>
+            <select class="sel" aria-label="按优先级筛选">
+              <option>全部优先级</option><option>高</option><option>中</option><option>低</option>
+            </select>
+            <select class="sel" aria-label="按负责人筛选">
+              <option>全部负责人</option><option>林</option><option>周</option>
+            </select>
+            <button class="btn" type="button">更多筛选</button>
+          </div>
+        </div>
+
+        <table>
+          <caption class="sub" style="text-align:left;padding:0 var(--s4) var(--s2)">工单列表，按更新时间倒序</caption>
+          <thead>
+            <tr>
+              <th scope="col">编号</th>
+              <th scope="col">标题</th>
+              <th scope="col">客户</th>
+              <th scope="col">状态</th>
+              <th scope="col">优先级</th>
+              <th scope="col" class="num">已等待</th>
+              <th scope="col">负责人</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="id">#1042</td><td>支付回调超时</td><td>青柚科技</td>
+              <td><span class="tag t-warn">待处理</span></td><td>高</td>
+              <td class="num">2 小时</td><td>林</td>
+            </tr>
+            <tr>
+              <td class="id">#1041</td><td>账号无法登录</td><td>远景数据</td>
+              <td><span class="tag t-info">处理中</span></td><td>中</td>
+              <td class="num">38 分钟</td><td>周</td>
+            </tr>
+            <tr>
+              <td class="id">#1040</td><td>发票抬头修改</td><td>海图物流</td>
+              <td><span class="tag t-ok">已完成</span></td><td>低</td>
+              <td class="num">—</td><td>林</td>
+            </tr>
+            <tr>
+              <td class="id">#1039</td><td>批量导出失败（>5,000 行）</td><td>北岸传媒</td>
+              <td><span class="tag t-err">已升级</span></td><td>高</td>
+              <td class="num">6 小时</td><td>值班组</td>
+            </tr>
+            <tr>
+              <td class="id">#1038</td><td>Webhook 重复推送</td><td>青柚科技</td>
+              <td><span class="tag t-info">处理中</span></td><td>中</td>
+              <td class="num">1 小时</td><td>周</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="panel-foot">
+          <span>显示 1–5 条，共 128 条</span>
+          <div class="pager" role="navigation" aria-label="分页">
+            <button class="pg" type="button" aria-label="上一页">‹</button>
+            <button class="pg" type="button" aria-current="page">1</button>
+            <button class="pg" type="button">2</button>
+            <button class="pg" type="button">3</button>
+            <button class="pg" type="button" aria-label="下一页">›</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+</body>
+</html>

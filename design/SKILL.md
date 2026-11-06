@@ -247,6 +247,8 @@ __/10（机器分 __/100）。可以交付 / 需修 3 处 / 建议重做结构�
 | [interaction.md](interaction.md) | 要处理体验：十原则、状态机、反馈时限、动效、表单、WCAG |
 | [surfaces.md](surfaces.md) | 按产出类型取配方：网页 / App / 仪表盘 / PPT / 报告 / 海报 / 图表 |
 | [checklist.md](checklist.md) | 交付前逐条勾选 |
+| [examples/](examples/) | 不想从零写：6 个成品页（落地页/后台/组件/表单/H5/图表）可直接复制改，每个 100/100 |
+| [examples/reference.md](examples/reference.md) | 要横向参照：15 个成熟方案的"借什么 / 别借什么" |
 | [tokens.css](tokens.css) | 直接引用的 token 起点（亮/暗双主题） |
 | `scripts/audit_design.py` | 审查 HTML/CSS，出分数与硬伤 |
 | `scripts/make_tokens.py` | 按种子色生成整套 token |

@@ -40,6 +40,7 @@ deepseek-harness-kb/
 │   ├── surfaces.md      #   网页/App/仪表盘/PPT/报告/海报/图表/README 配方
 │   ├── checklist.md     #   交付前逐条勾选
 │   ├── tokens.css       #   亮/暗双主题 token
+│   ├── examples/        #   6 个成品示例（每个 100/100）+ 15 个成熟方案参考
 │   └── scripts/         #   make_tokens.py / audit_design.py
 ├── notes/               # 个人笔记（环境速查 / 踩坑模板）
 └── scripts/

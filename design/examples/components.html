@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>组件陈列参考 · 设计质量系统</title>
+<style>
+  :root{
+    --brand-50:#f5f7fb; --brand-100:#e8edf7; --brand-500:#2563eb; --brand-600:#144cc6; --brand-700:#1b4295;
+    --n-50:#fafafb; --n-100:#f4f5f6; --n-200:#e7e8eb; --n-300:#d0d2d8; --n-500:#828897;
+    --n-600:#616775; --n-700:#464a53; --n-900:#1a1b1e;
+    --ok:#15803d; --ok-bg:#f0fdf4; --warn:#b45309; --warn-bg:#fffbeb;
+    --err:#b91c1c; --err-bg:#fef2f2;
+    --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s6:24px; --s8:32px; --s12:48px; --s16:64px;
+    --t-xs:12px; --t-sm:14px; --t-base:16px; --t-lg:18px; --t-xl:20px; --t-2xl:24px; --t-3xl:30px;
+    --r-sm:4px; --r-md:8px; --r-lg:12px; --r-full:999px;
+    --sh1:0 1px 2px rgb(15 23 42/.06),0 1px 1px rgb(15 23 42/.04);
+    --sh2:0 4px 8px -2px rgb(15 23 42/.08),0 2px 4px -2px rgb(15 23 42/.06);
+    --sh4:0 24px 48px -12px rgb(15 23 42/.18),0 8px 16px -8px rgb(15 23 42/.10);
+    --ease:cubic-bezier(.2,0,0,1); --dur:200ms;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;background:var(--n-50);color:var(--n-900);
+    font:400 14px/1.5 -apple-system,BlinkMacSystemFont,"PingFang SC","Segoe UI","Noto Sans SC",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:var(--s8) var(--s6) var(--s16)}
+  h1{margin:0 0 var(--s2);font-size:var(--t-2xl);line-height:1.25;letter-spacing:-.02em;font-weight:600}
+  .sub{margin:0 0 var(--s8);font-size:var(--t-sm);color:var(--n-500)}
+  section{margin-bottom:var(--s8)}
+  h2{margin:0 0 var(--s3);font-size:var(--t-base);font-weight:600}
+  .demo{background:#fff;border:1px solid var(--n-200);border-radius:var(--r-lg);padding:var(--s6);
+    display:grid;gap:var(--s4)}
+  .row{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s3)}
+  .col{display:grid;gap:var(--s3);max-width:440px}
+  :focus-visible{outline:2px solid var(--brand-500);outline-offset:2px}
+
+  /* ---------- 按钮：三档尺寸，同一套语义 ---------- */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);
+    border:1px solid transparent;border-radius:var(--r-md);font-weight:500;cursor:pointer;
+    transition:background var(--dur) var(--ease),border-color var(--dur) var(--ease),transform var(--dur) var(--ease)}
+  .btn:active{transform:scale(.98)}
+  .btn-sm{height:32px;padding:0 var(--s3);font-size:var(--t-sm)}
+  .btn-md{height:40px;padding:0 var(--s4);font-size:var(--t-sm)}
+  .btn-lg{height:48px;padding:0 var(--s6);font-size:var(--t-base)}
+  .v-primary{background:var(--brand-600);color:#fff;border-color:var(--brand-600)}
+  .v-primary:hover{background:var(--brand-700);border-color:var(--brand-700)}
+  .v-secondary{background:#fff;color:var(--n-700);border-color:var(--n-300)}
+  .v-secondary:hover{background:var(--n-100)}
+  .v-ghost{background:transparent;color:var(--brand-600)}
+  .v-ghost:hover{background:var(--brand-50)}
+  .v-danger{background:var(--err);color:#fff;border-color:var(--err)}
+  .v-danger:hover{background:#991b1b}
+  .btn[disabled]{background:var(--n-100);color:var(--n-500);border-color:var(--n-200);cursor:not-allowed;transform:none}
+
+  /* ---------- 输入：default / focus / error / disabled ---------- */
+  .field{display:grid;gap:var(--s2)}
+  .label{font-size:var(--t-sm);font-weight:500;color:var(--n-700)}
+  .label .req{color:var(--err);margin-left:var(--s1)}
+  .input,.select,.textarea{width:100%;height:40px;padding:0 var(--s3);border:1px solid var(--n-300);
+    border-radius:var(--r-md);background:#fff;color:var(--n-900);font:inherit;font-size:var(--t-sm);
+    transition:border-color var(--dur) var(--ease),box-shadow var(--dur) var(--ease)}
+  .input::placeholder,.textarea::placeholder{color:var(--n-500)}
+  .input:focus,.select:focus,.textarea:focus{outline:none;border-color:var(--brand-500);box-shadow:0 0 0 3px var(--brand-100)}
+  .textarea{height:auto;min-height:88px;padding:var(--s2) var(--s3);resize:vertical}
+  .is-error{border-color:var(--err);background:var(--err-bg)}
+  .is-error:focus{box-shadow:0 0 0 3px var(--err-bg)}
+  .hint{font-size:var(--t-xs);color:var(--n-500)}
+  .errmsg{font-size:var(--t-xs);color:var(--err)}
+  .input[disabled]{background:var(--n-100);color:var(--n-500);cursor:not-allowed}
+
+  /* ---------- 选择控件 ---------- */
+  .opt{display:inline-flex;align-items:center;gap:var(--s2);font-size:var(--t-sm);color:var(--n-700);cursor:pointer}
+  .opt input{width:16px;height:16px;accent-color:var(--brand-600)}
+  .sw{position:relative;display:inline-flex;align-items:center;gap:var(--s2);cursor:pointer;font-size:var(--t-sm);color:var(--n-700)}
+  .sw input{position:absolute;opacity:0;width:0;height:0}
+  .track{width:36px;height:20px;border-radius:var(--r-full);background:var(--n-300);position:relative;transition:background var(--dur) var(--ease)}
+  .track::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:var(--r-full);
+    background:#fff;box-shadow:var(--sh1);transition:transform var(--dur) var(--ease)}
+  .sw input:checked+.track{background:var(--brand-600)}
+  .sw input:checked+.track::after{transform:translateX(16px)}
+  .sw input:focus-visible+.track{outline:2px solid var(--brand-500);outline-offset:2px}
+
+  /* ---------- 标签 / 状态 ---------- */
+  .tag{display:inline-flex;align-items:center;height:24px;padding:0 var(--s2);border-radius:var(--r-sm);font-size:var(--t-xs);font-weight:500}
+  .t-ok{background:var(--ok-bg);color:var(--ok)}
+  .t-warn{background:var(--warn-bg);color:var(--warn)}
+  .t-err{background:var(--err-bg);color:var(--err)}
+  .t-brand{background:var(--brand-50);color:var(--brand-600)}
+
+  /* ---------- 卡片 / 列表项 ---------- */
+  .card{background:#fff;border:1px solid var(--n-200);border-radius:var(--r-lg);padding:var(--s4);
+    display:grid;gap:var(--s2);transition:box-shadow var(--dur) var(--ease),transform var(--dur) var(--ease)}
+  .card:hover{box-shadow:var(--sh2);transform:translateY(-2px)}
+  .card h3{margin:0;font-size:var(--t-base);font-weight:600}
+  .card p{margin:0;font-size:var(--t-sm);color:var(--n-600);line-height:1.5}
+  .list{background:#fff;border:1px solid var(--n-200);border-radius:var(--r-lg);overflow:hidden}
+  .li{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) var(--s4);border-bottom:1px solid var(--n-100);min-height:56px}
+  .li:last-child{border-bottom:0}
+  .li:hover{background:var(--n-50)}
+  .li .main{min-width:0;flex:1}
+  .li .main b{display:block;font-weight:500;font-size:var(--t-sm)}
+  .li .main span{font-size:var(--t-xs);color:var(--n-500)}
+  .li .chev{color:var(--n-500);font-size:var(--t-sm)}
+
+  /* ---------- Tabs / 面包屑 / 分页 ---------- */
+  .tabs{display:flex;gap:var(--s6);border-bottom:1px solid var(--n-200)}
+  .tab{position:relative;padding:var(--s2) 0 var(--s3);font-size:var(--t-sm);color:var(--n-600);text-decoration:none;background:none;border:0;cursor:pointer}
+  .tab[aria-selected]{color:var(--n-900);font-weight:500}
+  .tab[aria-selected]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--brand-600)}
+  .crumb{display:flex;gap:var(--s2);align-items:center;font-size:var(--t-sm);color:var(--n-500)}
+  .crumb b{color:var(--n-900);font-weight:500}
+  .pager{display:flex;gap:var(--s1)}
+  .pg{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid var(--n-200);
+    border-radius:var(--r-md);background:#fff;color:var(--n-700);font-size:var(--t-sm);cursor:pointer}
+  .pg[aria-current]{background:var(--brand-50);border-color:var(--brand-100);color:var(--brand-600)}
+
+  /* ---------- 骨架 / 空态 / 提示 ---------- */
+  .sk{height:16px;border-radius:var(--r-sm);background:linear-gradient(90deg,var(--n-100) 25%,var(--n-200) 37%,var(--n-100) 63%);
+    background-size:400% 100%;animation:sh 1.4s ease-in-out infinite}
+  .sk.w60{width:60%} .sk.w40{width:40%}
+  @keyframes sh{0%{background-position:100% 50%}100%{background-position:0 50%}}
+  .empty{display:grid;place-items:center;gap:var(--s3);padding:var(--s12) var(--s6);text-align:center}
+  .empty .ico{width:40px;height:40px;border-radius:var(--r-full);background:var(--n-100);display:grid;place-items:center;color:var(--n-500)}
+  .empty b{font-size:var(--t-base);font-weight:600}
+  .empty p{margin:0;font-size:var(--t-sm);color:var(--n-500);max-width:32ch}
+  .toast{display:flex;align-items:center;gap:var(--s3);background:var(--n-900);color:#fff;
+    padding:var(--s3) var(--s4);border-radius:var(--r-md);box-shadow:var(--sh2);font-size:var(--t-sm);max-width:420px}
+  .toast a{color:#fff;text-decoration:underline;margin-left:auto}
+  .alert{display:grid;gap:var(--s1);padding:var(--s3) var(--s4);border-radius:var(--r-md);background:var(--err-bg);
+    border:1px solid #fecaca;font-size:var(--t-sm)}
+  .alert b{color:var(--err);font-weight:600}
+  .alert span{color:var(--n-700)}
+
+  /* ---------- 弹窗 ---------- */
+  .modal{demo} /* 占位，实际弹窗见下 */
+  .dialog{max-width:400px;background:#fff;border-radius:var(--r-lg);box-shadow:var(--sh4);overflow:hidden}
+  .dialog-h{padding:var(--s4) var(--s6);border-bottom:1px solid var(--n-100);font-weight:600}
+  .dialog-b{padding:var(--s4) var(--s6);font-size:var(--t-sm);color:var(--n-700);line-height:1.5}
+  .dialog-f{display:flex;justify-content:flex-end;gap:var(--s2);padding:var(--s3) var(--s6);background:var(--n-50);border-top:1px solid var(--n-100)}
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+    .sk{animation:none;background:var(--n-100)}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>组件陈列</h1>
+  <p class="sub">同一套语义的按钮、输入、标签、列表与状态组件。改配色只改 token，改尺寸只改三档其中之一。</p>
+
+  <section>
+    <h2>按钮：3 档尺寸 × 5 种语义</h2>
+    <div class="demo">
+      <div class="row">
+        <button class="btn btn-sm v-primary" type="button">小号</button>
+        <button class="btn btn-md v-primary" type="button">中号（默认）</button>
+        <button class="btn btn-lg v-primary" type="button">大号</button>
+        <button class="btn btn-md v-primary" type="button" disabled>禁用</button>
+      </div>
+      <div class="row">
+        <button class="btn btn-md v-secondary" type="button">次要</button>
+        <button class="btn btn-md v-ghost" type="button">幽灵</button>
+        <button class="btn btn-md v-danger" type="button">删除</button>
+      </div>
+      <p class="hint" style="margin:0">规则：一屏只有一个 primary；尺寸只取 32 / 40 / 48；禁用不是灰掉了事，要说明为什么不能点。</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>输入：4 种状态</h2>
+    <div class="demo">
+      <div class="col">
+        <div class="field">
+          <label class="label" for="i1">工作邮箱<span class="req">*</span></label>
+          <input class="input" id="i1" placeholder="name@example.com" />
+          <span class="hint">用于接收工单通知</span>
+        </div>
+        <div class="field">
+          <label class="label" for="i2">手机号</label>
+          <input class="input is-error" id="i2" value="1380013" aria-invalid="true" aria-describedby="e2" />
+          <span class="errmsg" id="e2">手机号需要 11 位数字，还差 4 位</span>
+        </div>
+        <div class="field">
+          <label class="label" for="i3">已绑定的账号</label>
+          <input class="input" id="i3" value="lin@northwind.dev" disabled />
+          <span class="hint">由管理员统一维护</span>
+        </div>
+        <div class="field">
+          <label class="label" for="i4">备注</label>
+          <textarea class="textarea" id="i4" placeholder="选填，30 字以内"></textarea>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>选择控件</h2>
+    <div class="demo">
+      <div class="row" style="gap:var(--s6)">
+        <label class="opt"><input type="checkbox" checked /> 接收邮件通知</label>
+        <label class="opt"><input type="checkbox" /> 接收短信通知</label>
+      </div>
+      <div class="row" style="gap:var(--s6)">
+        <label class="opt"><input type="radio" name="r" checked /> 按工单分派</label>
+        <label class="opt"><input type="radio" name="r" /> 按客户分派</label>
+      </div>
+      <div class="row" style="gap:var(--s6)">
+        <label class="sw"><input type="checkbox" checked /><span class="track" aria-hidden="true"></span>自动分配</label>
+        <label class="sw"><input type="checkbox" /><span class="track" aria-hidden="true"></span>超时升级</label>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>标签与状态</h2>
+    <div class="demo">
+      <div class="row">
+        <span class="tag t-warn">待处理</span>
+        <span class="tag t-err">已升级</span>
+        <span class="tag t-ok">已完成</span>
+        <span class="tag t-brand">新客户</span>
+      </div>
+      <p class="hint" style="margin:0">标签 = 浅底 + 深字 + 4px 圆角；不要用彩色文字代替标签，也不要给每个标签配图标。</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>卡片与列表项</h2>
+    <div class="demo">
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s4)">
+        <article class="card">
+          <h3>支付回调超时</h3>
+          <p>客户支付成功但未收到回调，已等待 2 小时。</p>
+          <div class="row"><span class="tag t-warn">待处理</span><span class="hint">#1042</span></div>
+        </article>
+        <article class="card">
+          <h3>账号无法登录</h3>
+          <p>密码正确但提示会话过期，疑似 Cookie 策略。</p>
+          <div class="row"><span class="tag t-brand">处理中</span><span class="hint">#1041</span></div>
+        </article>
+      </div>
+      <div class="list">
+        <a class="li" href="#" style="text-decoration:none;color:inherit">
+          <div class="main"><b>知识库：退换货政策</b><span>更新于 3 天前 · 12 人查看</span></div>
+          <span class="chev" aria-hidden="true">›</span>
+        </a>
+        <a class="li" href="#" style="text-decoration:none;color:inherit">
+          <div class="main"><b>知识库：发票开具流程</b><span>更新于上周 · 8 人查看</span></div>
+          <span class="chev" aria-hidden="true">›</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>导航：Tabs / 面包屑 / 分页</h2>
+    <div class="demo">
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" aria-selected="true" type="button">全部</button>
+        <button class="tab" role="tab" aria-selected="false" type="button">待处理</button>
+        <button class="tab" role="tab" aria-selected="false" type="button">已完成</button>
+      </div>
+      <div class="crumb"><span>工单</span><span aria-hidden="true">/</span><b>#1042</b></div>
+      <div class="pager" role="navigation" aria-label="分页">
+        <button class="pg" type="button" aria-label="上一页">‹</button>
+        <button class="pg" type="button" aria-current="page">1</button>
+        <button class="pg" type="button">2</button>
+        <button class="pg" type="button">3</button>
+        <button class="pg" type="button" aria-label="下一页">›</button>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>状态：骨架 / 空 / 错误 / 成功</h2>
+    <div class="demo">
+      <div style="display:grid;gap:var(--s3);max-width:440px">
+        <div class="sk"></div><div class="sk w60"></div><div class="sk w40"></div>
+      </div>
+      <div class="empty">
+        <div class="ico" aria-hidden="true">□</div>
+        <b>还没有工单</b>
+        <p>导入历史工单或新建一条，就能看到统计。</p>
+        <button class="btn btn-md v-primary" type="button">新建工单</button>
+      </div>
+      <div class="alert"><b>保存失败</b><span>网络中断，改动已暂存在本地。恢复后可点“重试”提交。</span></div>
+      <div class="toast">已复制工单编号 <a href="#">撤销</a></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>弹窗</h2>
+    <div class="demo">
+      <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dlg-t">
+        <div class="dialog-h" id="dlg-t">删除 3 条工单？</div>
+        <div class="dialog-b">删除后 30 天内可在回收站恢复，超过 30 天将永久删除。</div>
+        <div class="dialog-f">
+          <button class="btn btn-md v-secondary" type="button">取消</button>
+          <button class="btn btn-md v-danger" type="button">删除</button>
+        </div>
+      </div>
+      <p class="hint" style="margin:0">弹窗固定一个标题、一句后果说明、两个按钮；危险按钮不默认聚焦，Esc 可关。</p>
+    </div>
+  </section>
+</div>
+</body>
+</html>

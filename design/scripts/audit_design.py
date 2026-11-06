@@ -136,7 +136,7 @@ def rules_of(css):
     return re.findall(r"([^{}@/][^{}]*)\{([^{}]*)\}", css)
 
 
-DECL_RE = re.compile(r"([-a-zA-Z]+)\s*:\s*([^;{}]+)")
+DECL_RE = re.compile(r"([-a-zA-Z0-9_]+)\s*:\s*([^;{}]+)")  # 自定义属性 --space-4 含数字，名字要能匹配
 
 
 def declarations(block):
@@ -183,13 +183,36 @@ def audit_css(css, inline_styles):
             all_decls.append(("inline", prop, val))
 
     # ---- 间距刻度
+    # token 化的页面（padding: var(--space-4)）不能因为没有字面 px 就被判"未声明"，
+    # 先把自定义属性里的 px 建表，再让 var(--x) 参与解析。
+    custom_px = {}
+    for _, prop, val in all_decls:
+        if prop.startswith("--"):
+            hits = re.findall(r"-?\d+\.?\d*px", val)
+            if len(hits) == 1:
+                custom_px[prop] = px(hits[0])
+
+    def resolve_px(v):
+        p = px(v)
+        if p is not None:
+            return p
+        m = re.match(r"var\(\s*(--[A-Za-z0-9_-]+)", v.strip())
+        if m:
+            return custom_px.get(m.group(1))
+        return None
+
     spacing_vals = []
     for _, prop, val in all_decls:
         if prop in SPACING_PROPS:
             for v in split_values(val):
-                p = px(v)
+                p = resolve_px(v)
                 if p is not None:
                     spacing_vals.append((v, p))
+    # 只有自定义属性、没有直接写在规则里的情况：用属性名带间距语义的变量来判
+    if not spacing_vals:
+        for name, p in custom_px.items():
+            if re.search(r"(space|gap|pad|margin|inset|s\d+)", name, re.I):
+                spacing_vals.append((name, p))
     if spacing_vals:
         off = [(v, p) for v, p in spacing_vals if p not in SPACING_SCALE]
         ratio = len(off) / len(spacing_vals)
@@ -277,6 +300,24 @@ def audit_css(css, inline_styles):
     assumed = global_bg is None
     bg_use = global_bg or "#ffffff"
     seen = {p[0] for p in pairs}
+
+    # 元素自身没写底色但祖先写了（如 .cta-box 的深色卡片）时，不能拿页面底色去算，
+    # 否则白字压在深色卡上会被误判成 1:1。
+    bg_by_sel = {}
+    for sel, block in rules:
+        d = dict(declarations(block))
+        b = d.get("background-color") or d.get("background")
+        if b:
+            bg_by_sel[sel.strip()] = b
+
+    def ancestor_bg(sel):
+        parts = [t for t in re.split(r"\s+|\>|\+|~", sel.strip()) if t]
+        for i in range(len(parts) - 1, 0, -1):
+            key = " ".join(parts[:i])
+            if key in bg_by_sel:
+                return bg_by_sel[key]
+        return None
+
     for sel, block in rules:
         if sel in seen:
             continue
@@ -284,16 +325,20 @@ def audit_css(css, inline_styles):
         fg = d.get("color")
         if not fg or "var(" in fg or "background" in d or not to_rgb(fg):
             continue
+        abg = ancestor_bg(sel)
+        if abg and ("var(" in abg or "gradient" in abg):
+            continue  # 祖先底色无法解析，不做判断
+        local_bg = abg or bg_use
         rgb = to_rgb(fg)
-        if assumed and luminance(rgb) > 0.65:
+        if assumed and not abg and luminance(rgb) > 0.65:
             continue  # 假定白底下的浅色文字，可能是深色主题，不误判
-        ratio = contrast(fg, bg_use)
+        ratio = contrast(fg, local_bg)
         if ratio is None:
             continue
         size = px(d.get("font-size", "16px")) or 16
         weight = int(re.sub(r"[^0-9]", "", d.get("font-weight", "400")) or 400)
         large = size >= 18 or (size >= 14 and weight >= 700)
-        pairs.append((sel, fg, bg_use + ("(页面底色)" if assumed else ""), ratio, large, size))
+        pairs.append((sel, fg, local_bg + ("(页面底色)" if (assumed and not abg) else ""), ratio, large, size))
 
     bad = [p for p in pairs if p[3] < (3.0 if p[4] else 4.5)]
     if bad:
@@ -315,6 +360,8 @@ def audit_css(css, inline_styles):
     durations = []
     for _, prop, val in all_decls:
         if prop.startswith("transition") or prop.startswith("animation"):
+            if "infinite" in val:
+                continue  # 循环型动效（骨架屏 shimmer、加载指示）不受 150–300ms 区间约束
             for m in re.finditer(r"(\d+(?:\.\d+)?)(ms|s)\b", val):
                 d = float(m.group(1)) * (1 if m.group(2) == "ms" else 1000)
                 durations.append(d)
