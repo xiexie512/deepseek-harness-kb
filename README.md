@@ -30,6 +30,17 @@ deepseek-harness-kb/
 │   ├── douyin-bot.md    #   自动刷抖音 + DeepSeek 决策 + QQ 播报
 │   ├── workspace-sync.md#   挂载健康确认服务
 │   └── zhipu-model-label.md # 智谱模型标签插件
+├── design/              # 设计质量系统（可当 Skill 装，也可当规范读）
+│   ├── README.md        #   索引：怎么读、怎么装、命令
+│   ├── SKILL.md         #   主流程（诊断 → 约束 → 版式 → 上色 → 状态）
+│   ├── foundations.md   #   间距/字阶/色彩/阴影/栅格/图标/图片数值手册
+│   ├── components.md    #   16 类组件的尺寸与状态规格
+│   ├── patterns.md      #   列表/表单/详情/设置/空状态等 9 种页面模式
+│   ├── interaction.md   #   十原则、9 种状态、动效、WCAG 2.2 清单
+│   ├── surfaces.md      #   网页/App/仪表盘/PPT/报告/海报/图表/README 配方
+│   ├── checklist.md     #   交付前逐条勾选
+│   ├── tokens.css       #   亮/暗双主题 token
+│   └── scripts/         #   make_tokens.py / audit_design.py
 ├── notes/               # 个人笔记（环境速查 / 踩坑模板）
 └── scripts/
     └── kb.sh            # 终端访问脚本（curl 封装）
@@ -46,7 +57,7 @@ curl -s https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/llm
 # 2. 抓取单篇文档
 curl -s https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/docs/architecture.md
 
-# 3. 单次抓取全量（约 30KB，适合一次性喂给模型）
+# 3. 单次抓取全量（约 130KB，适合一次性喂给模型）
 curl -s https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/llms-full.txt
 
 # 4. 用配套脚本（列出 / 按主题取 / 全文搜索；内置 raw → jsDelivr → GitHub API 三源自动回退）
@@ -69,6 +80,30 @@ bash /tmp/kb.sh list
 ./kb.sh update            # 刷新缓存
 ```
 
+## 设计规范（design/）
+
+一套把"好看"和"好用"落成具体数值的规范，**任何人 / 任何模型都能直接照它改设计**，不依赖审美。
+
+- 合并了 Apple HIG、Material 3 动效、Nielsen 十原则、WCAG 2.2 AA、Refactoring UI 的硬指标。
+- 覆盖：间距/字阶/色彩/阴影/栅格 → 组件尺寸与状态 → 页面模式 → 交互与无障碍 → 分场景配方 → 交付清单。
+- 自带两个脚本（仅标准库）：
+
+```sh
+# 按种子色生成整套 token（含对比度自检）
+python3 design/scripts/make_tokens.py --seed "#2563eb" --mode both --out design/tokens.css
+
+# 审查 HTML/CSS：0–100 分 + 硬伤清单
+python3 design/scripts/audit_design.py index.html
+```
+
+- 也可以直接装成 Agent Skill：
+
+```sh
+ln -sfn "$PWD/deepseek-harness-kb/design" "$HOME/.agents/skills/design-quality"
+```
+
+入口：[design/README.md](design/README.md) ｜ 验收：[design/checklist.md](design/checklist.md)
+
 ## 人如何访问
 
 浏览器直接打开仓库页面浏览，或 clone 到本地：
@@ -81,6 +116,7 @@ git clone https://github.com/xiexie512/deepseek-harness-kb.git
 
 - `docs/` 内容整理自 deepseek-ai/deepseek-harness 官方文档（MIT License），每篇标注来源。
 - `projects/` 为作者个人项目文档，源码位于本机 `~/Desktop/DeepSeek/`。
+- `design/` 为个人整理的设计规范，指标来源：Apple HIG、Material Design 3、Nielsen Norman Group、W3C WCAG 2.2、Refactoring UI，均为公开资料的观点与数值整理。
 - 本仓库整体采用 **MIT License**。
 
 ## 安全说明

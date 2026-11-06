@@ -26,6 +26,18 @@
 - [workspace-sync](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/projects/workspace-sync.md): 容器挂载健康确认服务
 - [zhipu-model-label](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/projects/zhipu-model-label.md): 智谱模型【免费/付费】标签 DSH 客户端插件
 
+## 设计规范（design/，不依赖 dsh，任何设计任务都可用）
+
+- [设计质量系统 · 索引](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/design/README.md): 这套规范是什么、怎么读、怎么装成 Skill、两个脚本的命令
+- [设计质量系统 · 主流程 SKILL.md](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/design/SKILL.md): 五步流程（诊断/约束/版式/上色/状态）、症状→处方速查、10 项评分卡、反 AI 味清单
+- [基础系统](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/design/foundations.md): 间距刻度、字阶表、色彩系统与暗色映射、阴影 4 级、圆角、栅格、图标与图片
+- [组件规格](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/design/components.md): 16 类组件的尺寸/状态/间距规格与反例
+- [页面模式](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/design/patterns.md): 列表、表单、详情、设置、搜索筛选、空状态、引导、登录、多步骤流程
+- [交互与体验](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/design/interaction.md): 十原则→动作、9 种状态、反馈时限、动效表、微交互、WCAG 2.2 清单
+- [场景配方](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/design/surfaces.md): 网页/App/仪表盘/PPT/报告/海报/图表/Markdown README 的结构与数值
+- [交付前清单](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/design/checklist.md): 按产出类型的逐条勾选清单
+- [设计 token](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/design/tokens.css): 亮/暗双主题 CSS 变量，可直接 @import
+
 ## 个人笔记（notes/）
 
 - [环境速查](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/notes/setup.md): 版本、目录布局、安装方式、常用命令、备份习惯
@@ -40,3 +52,4 @@
 - 想配置模型 → docs/models.md
 - 想用 Python 调用 → docs/sdk.md
 - 想参考真实项目 → projects/
+- 想把界面/PPT/文档做得更好看 → design/SKILL.md（快速查：design/checklist.md）

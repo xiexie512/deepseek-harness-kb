@@ -25,7 +25,7 @@ try_raw() { curl "${CURL_OPTS[@]}" "$BASE/$1" -o "$2" 2>/dev/null && is_md "$2";
 
 try_jsdelivr() { curl "${CURL_OPTS[@]}" "$JSDELIVR/$1" -o "$2" 2>/dev/null && is_md "$2"; }
 
-TOPICS="overview quickstart cli architecture plugins configuration models sdk glossary dsh-pet dsh-phone qqbot douyin-bot workspace-sync zhipu-model-label setup llms full"
+TOPICS="overview quickstart cli architecture plugins configuration models sdk glossary dsh-pet dsh-phone qqbot douyin-bot workspace-sync zhipu-model-label design foundations components patterns interaction surfaces checklist setup llms full"
 
 # 主题 → 文件路径（新增文档时在此登记）
 path_for() {
@@ -45,6 +45,13 @@ path_for() {
     douyin-bot)        echo "projects/douyin-bot.md" ;;
     workspace-sync)    echo "projects/workspace-sync.md" ;;
     zhipu-model-label) echo "projects/zhipu-model-label.md" ;;
+    design)            echo "design/SKILL.md" ;;
+    foundations)       echo "design/foundations.md" ;;
+    components)        echo "design/components.md" ;;
+    patterns)          echo "design/patterns.md" ;;
+    interaction)       echo "design/interaction.md" ;;
+    surfaces)          echo "design/surfaces.md" ;;
+    checklist)         echo "design/checklist.md" ;;
     setup)             echo "notes/setup.md" ;;
     llms)              echo "llms.txt" ;;
     full)              echo "llms-full.txt" ;;

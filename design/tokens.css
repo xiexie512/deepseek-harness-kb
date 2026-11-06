@@ -1,0 +1,110 @@
+/* 由 design-quality / make_tokens.py 生成。改动请改种子色后重新生成。 */
+
+:root {
+  /* ---- 品牌色阶 ---- */
+  --brand-50: #f5f7fb;
+  --brand-100: #e8edf7;
+  --brand-200: #cdd9f3;
+  --brand-300: #a3bbf0;
+  --brand-400: #6d95ee;
+  --brand-500: #2563eb;
+  --brand-600: #144cc6;
+  --brand-700: #1b4295;
+  --brand-800: #1e366a;
+  --brand-900: #1b2947;
+
+  /* ---- 中性色阶（继承品牌色相） ---- */
+  --neutral-50: #fafafb;
+  --neutral-100: #f4f5f6;
+  --neutral-200: #e7e8eb;
+  --neutral-300: #d0d2d8;
+  --neutral-400: #acb0b9;
+  --neutral-500: #828897;
+  --neutral-600: #616775;
+  --neutral-700: #464a53;
+  --neutral-800: #2f3237;
+  --neutral-900: #1a1b1e;
+
+  /* ---- 间距（4pt 基数） ---- */
+  --space-1: 4px;   --space-2: 8px;   --space-3: 12px;  --space-4: 16px;
+  --space-6: 24px;  --space-8: 32px;  --space-12: 48px;
+  --space-16: 64px; --space-24: 96px;
+
+  /* ---- 字号（约 1.25 阶梯） ---- */
+  --text-xs: 12px;   --text-sm: 14px;  --text-base: 16px; --text-lg: 18px;
+  --text-xl: 20px;   --text-2xl: 24px; --text-3xl: 30px;
+  --text-4xl: 36px;  --text-5xl: 48px; --text-6xl: 60px;
+
+  /* ---- 行高 ---- */
+  --leading-tight: 1.1;  --leading-snug: 1.25;
+  --leading-normal: 1.5; --leading-relaxed: 1.65;
+
+  /* ---- 字重 / 字距 ---- */
+  --weight-normal: 400; --weight-medium: 500;
+  --weight-semibold: 600; --weight-bold: 700;
+  --tracking-tight: -0.02em; --tracking-normal: 0;
+  --tracking-wide: 0.06em;
+
+  /* ---- 圆角 ---- */
+  --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px;
+  --radius-xl: 16px; --radius-full: 999px;
+
+  /* ---- 阴影（贴合层 + 氛围层） ---- */
+  --shadow-0: none;
+  --shadow-1: 0 1px 2px rgb(var(--shadow-color) / 0.06), 0 1px 1px rgb(var(--shadow-color) / 0.04);
+  --shadow-2: 0 4px 8px -2px rgb(var(--shadow-color) / 0.08), 0 2px 4px -2px rgb(var(--shadow-color) / 0.06);
+  --shadow-3: 0 12px 24px -6px rgb(var(--shadow-color) / 0.12), 0 4px 8px -4px rgb(var(--shadow-color) / 0.08);
+  --shadow-4: 0 24px 48px -12px rgb(var(--shadow-color) / 0.18), 0 8px 16px -8px rgb(var(--shadow-color) / 0.10);
+
+  /* ---- 动效 ---- */
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 150ms; --dur-base: 200ms; --dur-slow: 300ms;
+
+  /* ---- 布局 ---- */
+  --container: 1280px;
+  --container-prose: 65ch;
+  --container-form: 440px;
+
+  /* ---- 状态色（亮/暗通用，暗色下可再降饱和） ---- */
+  --success: #15803d; --success-bg: #f0fdf4;
+  --warning: #b45309; --warning-bg: #fffbeb;
+  --error:   #b91c1c; --error-bg:   #fef2f2;
+  --info:    #1d4ed8; --info-bg:    #eff6ff;
+
+  /* ---- 语义色（亮色） ---- */
+  --color-bg: #fafafb;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f4f5f6;
+  --color-border: #e7e8eb;
+  --color-border-strong: #d0d2d8;
+  --color-text: #1a1b1e;
+  --color-text-secondary: #616775;
+  --color-text-tertiary: #828897;
+  --color-primary: #144cc6;
+  --color-primary-hover: #1b4295;
+  --color-primary-active: #1e366a;
+  --color-primary-soft: #f5f7fb;
+  --color-on-primary: #ffffff;
+  --color-focus: #2563eb;
+  --shadow-color: 15 23 42;
+}
+[data-theme="dark"] {
+  /* ---- 语义色（暗色，不是反色：层级越高越亮） ---- */
+  --color-bg: #1a1b1e;
+  --color-surface: #1f2126;
+  --color-surface-alt: #2b2d33;
+  --color-border: #3a3c43;
+  --color-border-strong: #51545c;
+  --color-text: rgba(255, 255, 255, 0.87);
+  --color-text-secondary: rgba(255, 255, 255, 0.60);
+  --color-text-tertiary: rgba(255, 255, 255, 0.40);
+  --color-primary: #6d95ee;
+  --color-primary-hover: #a3bbf0;
+  --color-primary-active: #cdd9f3;
+  --color-primary-soft: #222b3f;
+  --color-on-primary: #1a1b1e;
+  --color-focus: #6d95ee;
+  --shadow-color: 0 0 0;
+}
