@@ -87,6 +87,7 @@ bash /tmp/kb.sh list
 
 - 合并了 Apple HIG、Material 3 动效、Nielsen 十原则、WCAG 2.2 AA、Refactoring UI 的硬指标。
 - 覆盖：间距/字阶/色彩/阴影/栅格 → 组件尺寸与状态 → 页面模式 → 交互与无障碍 → 分场景配方 → 交付清单。
+- 另附 **外部设计 Skill 地图**（[design/ecosystem.md](design/ecosystem.md)）：30+ 个公开方案（Anthropic frontend-design、taste-skill、impeccable、Vercel web-design-guidelines、UX Designer 等）的机制对照，标明哪些已并入本规范、哪些建议直接装、哪些不要叠用。
 - 自带两个脚本（仅标准库）：
 
 ```sh

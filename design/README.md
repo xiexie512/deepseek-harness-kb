@@ -31,6 +31,7 @@
 | 想直接用 token | [tokens.css](tokens.css) 或 `scripts/make_tokens.py` |
 | 想机器打分 | `scripts/audit_design.py` |
 | 想抄现成的 | [examples/](examples/) 6 个成品页 + [reference.md](examples/reference.md) 参考清单 |
+| 想装/选外部 Skill | [ecosystem.md](ecosystem.md)（30+ 个设计类 Skill 的机制对照 + 组合建议） |
 
 ## 文件清单
 
@@ -42,7 +43,8 @@
 | [patterns.md](patterns.md) | 列表页、表单页、详情页、设置页、空状态、引导、搜索、登录 8 种页面模式 |
 | [interaction.md](interaction.md) | 十原则→动作、9 种状态、反馈时限、动效表、表单、导航、WCAG 清单 |
 | [surfaces.md](surfaces.md) | 网页 / App / 仪表盘 / PPT / 报告 / 海报 / 图表 七套配方 |
-| [checklist.md](checklist.md) | 交付前逐条勾选（通用 + 分场景） |
+| [checklist.md](checklist.md) | 交付前逐条勾选（通用 + 分场景 + 一致性/伦理硬门） |
+| [ecosystem.md](ecosystem.md) | 外部设计 Skill 地图：官方、审美、设计系统、评审、UX 参考、MCP 六类，标"借什么 / 别借什么" |
 | [tokens.css](tokens.css) | 亮/暗双主题 token，可直接 `@import` |
 | `scripts/make_tokens.py` | 按种子色生成整套 token，自带对比度自检 |
 | `scripts/audit_design.py` | 审查 HTML/CSS，出 0–100 分与硬伤清单 |
@@ -62,6 +64,8 @@
 | [charts.html](examples/charts.html) | 标题写结论、一条高亮其余转灰、直接标注代替图例 |
 
 另外 [examples/reference.md](examples/reference.md) 列了 15 个成熟方案（Apple HIG / Material 3 / Ant / shadcn / Linear / Stripe …），每条标了"借什么、别借什么"。
+
+生态层面看 [ecosystem.md](ecosystem.md)：30+ 个公开的设计类 Agent Skill（Anthropic 官方、taste-skill、impeccable、Vercel web-design-guidelines、UX Designer、各类审计与抽取工具），标注了哪些机制已并入本规范、哪些建议直接安装、哪些不要叠用。
 
 ## 两种用法
 

@@ -39,6 +39,7 @@
 - [设计 token](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/design/tokens.css): 亮/暗双主题 CSS 变量，可直接 @import
 - [成品示例索引](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/design/examples/README.md): 6 个可直接复制的完整页面（落地页/后台/组件/表单/H5/图表），每个审计 100/100
 - [参考方案清单](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/design/examples/reference.md): Apple HIG / Material 3 / Ant / shadcn / Linear / Stripe 等 15 个方案，各标「借什么、别借什么」
+- [外部设计 Skill 地图](https://raw.githubusercontent.com/xiexie512/deepseek-harness-kb/main/design/ecosystem.md): 30+ 个公开设计类 Agent Skill（Anthropic frontend-design、taste-skill、impeccable、Vercel web-design-guidelines、UX Designer、审计/抽取工具），标明已并入的机制、安装建议与不要叠用的组合
 
 ## 个人笔记（notes/）
 
