@@ -10,3 +10,8 @@
 - 两轮问答后仍不确定就按推荐假设开工，并在开场句说明假设
 - 只把稳定偏好、硬约束、被否决方案写回 notes/decision-log.md，一次性细节不写
 - 否决：开工前先做探索性实现去猜用户意图
+
+## 2026-11-09 18:05 · 知识库写入通道
+
+- github.com:443 在本机不通，raw.githubusercontent.com 与 api.github.com 可达
+- 因此写入必须支持 gh api 兜底，不能只依赖 git push
