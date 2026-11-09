@@ -22,3 +22,8 @@
 - 每个选项需 option_id/label/description 三件套齐全，label 写「用户怎么回答」而非操作措辞
 - 禁止在正文用 Markdown 列表列选项让用户回「选 A 还是 B」
 - 只有必须由用户提供文件/链接时才用自由输入题
+
+## 2026-11-09 18:16 · Skill 部署范围与提问严格度
+
+- 部署：ask-before-start 同步到 ~/.dsh/skills/ask-before-start，供容器版 DSH 使用
+- 严格度：宁可多问一次 —— 只要答案会改变范围/交付形态/验收标准，即便方向已给也要先弹卡片
