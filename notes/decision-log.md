@@ -27,3 +27,11 @@
 
 - 部署：ask-before-start 同步到 ~/.dsh/skills/ask-before-start，供容器版 DSH 使用
 - 严格度：宁可多问一次 —— 只要答案会改变范围/交付形态/验收标准，即便方向已给也要先弹卡片
+
+## 2026-11-09 19:33 · 工作台终端与文件改用自带，并接入 Git
+
+- 决策：右侧工作台的文件树与终端一律用 DSH 自带（ui-sidebar-files / ui-sidebar-terminal）
+- 停用：better-sidebar、vscode-workbench、自写 side-workbench 三者全部 disabled（disabled 计数 13→15）
+- 未做的事：不自写 side-workbench 的替代实现——它那 2200 行文件/终端逻辑是按 macOS 路径写的，改用自带面板而不是改造它
+- Git 落地：新建 /root/work 并 git init（首个提交 7d124d2）；ui-git-graph 行显式 disabled: false，其 /git/* 节点路由已挂载（GET /git/repos 返回 405）
+- 遗留：git 图谱 UI 需先把 /root/work 添加为工作区才会显示分支/提交图
