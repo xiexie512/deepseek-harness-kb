@@ -35,3 +35,14 @@
 - 未做的事：不自写 side-workbench 的替代实现——它那 2200 行文件/终端逻辑是按 macOS 路径写的，改用自带面板而不是改造它
 - Git 落地：新建 /root/work 并 git init（首个提交 7d124d2）；ui-git-graph 行显式 disabled: false，其 /git/* 节点路由已挂载（GET /git/repos 返回 405）
 - 遗留：git 图谱 UI 需先把 /root/work 添加为工作区才会显示分支/提交图
+
+## 2026-11-09 20:36 · 自写工作台改为复用自带文件树与终端，新增 Git 页签
+
+- 结论：dsh-side-workbench 保留外壳，文件与终端不再自实现，改为 ctx.sidebarRight 委托
+- 客户端：inject=["sidebarRight"]；openTab("file"|"terminal") 先委托，失败才回落旧实现
+  · 文件 → openResource("dsh-resource://file/<绝对路径>")
+  · 终端 → openTab("terminal", {params:{shellPath:"/bin/bash"}})
+- 宿主：新增 /api/dsh-side-workbench/git/{status,log,diff,commit}，cwd 取 DSH_WORKBENCH_GIT_ROOT（默认 /root/work）
+- 部署要点：/opt/local-plugins 是镜像内拷贝而非 bind mount，改完必须 docker cp 进容器再 restart
+- 实测：右侧栏出现自带 bash 与 文件 两个页签；Git 页签读到 master / 7d124d2 / 干净
+- 坑：容器重启后到 401 需要 40–60 秒，早测会误判 502
