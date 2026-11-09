@@ -15,3 +15,10 @@
 
 - github.com:443 在本机不通，raw.githubusercontent.com 与 api.github.com 可达
 - 因此写入必须支持 gh api 兜底，不能只依赖 git push
+
+## 2026-11-09 18:15 · 提问形式偏好
+
+- 开工前的确认必须弹出可点击的选项卡片（interaction_ask），用户点按钮作答
+- 每个选项需 option_id/label/description 三件套齐全，label 写「用户怎么回答」而非操作措辞
+- 禁止在正文用 Markdown 列表列选项让用户回「选 A 还是 B」
+- 只有必须由用户提供文件/链接时才用自由输入题
